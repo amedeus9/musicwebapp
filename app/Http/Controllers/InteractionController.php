@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Song;
 use App\Models\Album;
+use App\Models\Playlist;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -68,6 +69,7 @@ class InteractionController extends Controller
         return match ($type) {
             'song' => Song::findOrFail($id),
             'album' => Album::findOrFail($id),
+            'playlist' => Playlist::findOrFail($id),
             default => abort(404),
         };
     }

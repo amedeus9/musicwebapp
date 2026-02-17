@@ -44,6 +44,11 @@ class User extends Authenticatable
         return $this->hasMany(Playlist::class);
     }
 
+    public function collaboratedPlaylists()
+    {
+        return $this->belongsToMany(Playlist::class, 'playlist_user');
+    }
+
     public function likedSongs()
     {
         return $this->hasManyThrough(

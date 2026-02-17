@@ -10,7 +10,7 @@
                 type="text"
                 name="search"
                 value="{{ request('search') }}"
-                class="block w-full pl-10 pr-3 py-2 border border-[#53a1b3]/10 rounded-none leading-5 bg-[#0f1319] text-[#53a1b3] placeholder-[#53a1b3]/40 focus:outline-none focus:bg-[#141e24] focus:border-[#e96c4c]/50 focus:ring-1 focus:ring-[#e96c4c]/50 sm:text-sm transition"
+                class="block w-full pl-10 pr-3 py-2 border border-[#53a1b3]/10 rounded-[3px] leading-5 bg-[#0f1319] text-[#53a1b3] placeholder-[#53a1b3]/40 focus:outline-none focus:bg-[#141e24] focus:border-[#e96c4c]/50 focus:ring-1 focus:ring-[#e96c4c]/50 text-xs transition placeholder:text-xs"
                 placeholder="Search for songs, artists, albums..."
             >
         </form>
@@ -20,7 +20,7 @@
     <div class="flex items-center gap-4">
 
         <!-- Upload Button (Mini) -->
-        <a href="{{ route('songs.create') }}" class="hidden lg:flex items-center gap-2 px-4 py-2 bg-[#e96c4c]/10 text-[#e96c4c] rounded-none text-xs font-normal uppercase tracking-wider hover:bg-[#e96c4c] hover:text-white transition">
+        <a href="{{ route('songs.create') }}" class="hidden lg:flex items-center gap-2 px-4 py-2 bg-[#e96c4c]/10 text-[#e96c4c] rounded-[3px] text-xs font-normal uppercase tracking-wider hover:bg-[#e96c4c] hover:text-white transition">
             <ion-icon name="cloud-upload-outline" class="w-4 h-4"></ion-icon>
             <span>Upload</span>
         </a>
@@ -40,7 +40,7 @@
                 <p class="text-[#53a1b3] text-[10px] uppercase tracking-wider">Free Plan</p>
             </div>
             @endauth
-            <div class="w-10 h-10 rounded-none bg-gradient-to-br from-[#141e24] to-[#0f1319] border border-[#53a1b3]/20 flex items-center justify-center text-[#53a1b3]">
+            <div class="w-10 h-10 rounded-[3px] bg-gradient-to-br from-[#141e24] to-[#0f1319] border border-[#53a1b3]/20 flex items-center justify-center text-[#53a1b3]">
                 <ion-icon name="person-outline" class="w-5 h-5"></ion-icon>
             </div>
         </div>

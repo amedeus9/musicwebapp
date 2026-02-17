@@ -43,4 +43,19 @@ class Playlist extends Model
                     ->withTimestamps()
                     ->orderBy('playlist_song.position');
     }
+
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
+
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    public function collaborators()
+    {
+        return $this->belongsToMany(User::class, 'playlist_user');
+    }
 }

@@ -49,14 +49,14 @@
             <!-- Player Interaction -->
             <div class="hidden md:flex flex-wrap items-center gap-2 mt-auto">
                 <!-- Play Button -->
-                <button id="play-btn-header" onclick="togglePlay()" class="h-10 w-10 px-2 md:h-10 md:w-auto md:px-4 bg-[#e96c4c] text-white flex items-center justify-center md:gap-2 hover:bg-[#e96c4c]/90 transition-all rounded-none text-[10px] uppercase md:min-w-[80px]">
-                    <ion-icon id="play-status-icon" name="play" class="w-3.5 h-3.5"></ion-icon>
+                <button id="play-btn-header" onclick="togglePlay()" class="px-4 py-2 bg-[#e96c4c] text-white flex items-center justify-center gap-2 hover:bg-[#e96c4c]/90 transition-all rounded-[3px] text-xs uppercase">
+                    <ion-icon id="play-status-icon" name="play" class="w-4 h-4"></ion-icon>
                     <span class="pt-px hidden md:inline">PLAY</span>
                 </button>
 
                 <!-- Download Button -->
-                <a href="{{ route('songs.download', $song) }}" class="h-10 w-10 px-2 md:h-10 md:w-auto md:px-4 bg-[#1a2730] border border-[#53a1b3]/10 text-[#53a1b3]/70 flex items-center justify-center md:gap-2 hover:bg-[#53a1b3]/5 hover:text-white transition-all rounded-none text-[10px] uppercase md:min-w-[100px]">
-                    <ion-icon name="cloud-download-outline" class="w-3.5 h-3.5"></ion-icon>
+                <a href="{{ route('songs.download', $song) }}" class="px-4 py-2 bg-[#1a2730] border border-[#53a1b3]/10 text-[#53a1b3]/70 flex items-center justify-center gap-2 hover:bg-[#53a1b3]/5 hover:text-white transition-all rounded-[3px] text-xs uppercase">
+                    <ion-icon name="cloud-download-outline" class="w-4 h-4"></ion-icon>
                     <span class="pt-px hidden md:inline">FREE DOWNLOAD</span>
                 </a>
 
@@ -64,17 +64,17 @@
                 <div class="flex items-center gap-2 ml-0 md:ml-2">
                     <form action="{{ route('interactions.like', ['type' => 'song', 'id' => $song->id]) }}" method="POST">
                         @csrf
-                        <button type="submit" class="w-10 h-10 px-2 flex items-center justify-center bg-[#1a2730] rounded-none border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-red-500 hover:border-red-500/20 transition-all">
-                            <ion-icon name="{{ $song->likes()->where('user_id', auth()->id())->exists() ? 'heart' : 'heart-outline' }}" class="w-3.5 h-3.5 {{ $song->likes()->where('user_id', auth()->id())->exists() ? 'text-red-500' : '' }}"></ion-icon>
+                        <button type="submit" class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-red-500 hover:border-red-500/20 transition-all">
+                            <ion-icon name="{{ $song->likes()->where('user_id', auth()->id())->exists() ? 'heart' : 'heart-outline' }}" class="w-4 h-4 {{ $song->likes()->where('user_id', auth()->id())->exists() ? 'text-red-500' : '' }}"></ion-icon>
                         </button>
                     </form>
 
-                    <button onclick="shareTrack()" class="w-10 h-10 px-2 flex items-center justify-center bg-[#1a2730] rounded-none border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-white hover:border-white/10 transition-all">
-                        <ion-icon name="share-social-outline" class="w-3.5 h-3.5"></ion-icon>
+                    <button onclick="shareTrack()" class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-white hover:border-white/10 transition-all">
+                        <ion-icon name="share-social-outline" class="w-4 h-4"></ion-icon>
                     </button>
 
                     @auth
-                    <button onclick="openPlaylistModal()" class="w-10 h-10 px-2 flex items-center justify-center bg-[#1a2730] rounded-none border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-white hover:border-white/10 transition-all">
+                    <button onclick="openPlaylistModal()" class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-white hover:border-white/10 transition-all">
                         <ion-icon name="add-outline" class="w-4 h-4"></ion-icon>
                     </button>
                     @endauth
@@ -83,7 +83,7 @@
                         <form action="{{ route('songs.destroy', $song) }}" method="POST" onsubmit="return confirm('Delete this track?');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="w-10 h-10 px-2 flex items-center justify-center bg-[#1a2730] rounded-none border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-red-500 hover:border-red-500/20 transition-all">
+                            <button type="submit" class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-red-500 hover:border-red-500/20 transition-all">
                                 <ion-icon name="trash-outline" class="w-4 h-4"></ion-icon>
                             </button>
                         </form>
@@ -96,30 +96,30 @@
     <!-- Mobile Buttons (Bottom) -->
     <div class="flex md:hidden flex-wrap items-center gap-2 px-0 mt-2">
         <!-- Play Button -->
-        <button id="play-btn-header-mobile" onclick="togglePlay()" class="h-10 w-10 px-2 bg-[#e96c4c] text-white flex items-center justify-center hover:bg-[#e96c4c]/90 transition-all rounded-none">
-            <ion-icon id="play-status-icon-mobile" name="play" class="w-3.5 h-3.5"></ion-icon>
+        <button id="play-btn-header-mobile" onclick="togglePlay()" class="px-4 py-2 bg-[#e96c4c] text-white flex items-center justify-center hover:bg-[#e96c4c]/90 transition-all rounded-[3px]">
+            <ion-icon id="play-status-icon-mobile" name="play" class="w-4 h-4"></ion-icon>
         </button>
 
         <!-- Download Button -->
-        <a href="{{ route('songs.download', $song) }}" class="h-10 w-10 px-2 bg-[#1a2730] border border-[#53a1b3]/10 text-[#53a1b3]/70 flex items-center justify-center hover:bg-[#53a1b3]/5 hover:text-white transition-all rounded-none">
-            <ion-icon name="cloud-download-outline" class="w-3.5 h-3.5"></ion-icon>
+        <a href="{{ route('songs.download', $song) }}" class="px-4 py-2 bg-[#1a2730] border border-[#53a1b3]/10 text-[#53a1b3]/70 flex items-center justify-center hover:bg-[#53a1b3]/5 hover:text-white transition-all rounded-[3px]">
+            <ion-icon name="cloud-download-outline" class="w-4 h-4"></ion-icon>
         </a>
 
         <!-- Icons Group Mobile -->
         <div class="flex items-center gap-2 ml-auto">
             <form action="{{ route('interactions.like', ['type' => 'song', 'id' => $song->id]) }}" method="POST">
                 @csrf
-                <button type="submit" class="w-10 h-10 px-2 flex items-center justify-center bg-[#1a2730] rounded-none border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-red-500 hover:border-red-500/20 transition-all">
-                    <ion-icon name="{{ $song->likes()->where('user_id', auth()->id())->exists() ? 'heart' : 'heart-outline' }}" class="w-3.5 h-3.5 {{ $song->likes()->where('user_id', auth()->id())->exists() ? 'text-red-500' : '' }}"></ion-icon>
+                <button type="submit" class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-red-500 hover:border-red-500/20 transition-all">
+                    <ion-icon name="{{ $song->likes()->where('user_id', auth()->id())->exists() ? 'heart' : 'heart-outline' }}" class="w-4 h-4 {{ $song->likes()->where('user_id', auth()->id())->exists() ? 'text-red-500' : '' }}"></ion-icon>
                 </button>
             </form>
 
-            <button onclick="shareTrack()" class="w-10 h-10 px-2 flex items-center justify-center bg-[#1a2730] rounded-none border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-white hover:border-white/10 transition-all">
-                <ion-icon name="share-social-outline" class="w-3.5 h-3.5"></ion-icon>
+            <button onclick="shareTrack()" class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-white hover:border-white/10 transition-all">
+                <ion-icon name="share-social-outline" class="w-4 h-4"></ion-icon>
             </button>
 
             @auth
-            <button onclick="openPlaylistModal()" class="w-10 h-10 px-2 flex items-center justify-center bg-[#1a2730] rounded-none border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-white hover:border-white/10 transition-all">
+            <button onclick="openPlaylistModal()" class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-white hover:border-white/10 transition-all">
                 <ion-icon name="add-outline" class="w-4 h-4"></ion-icon>
             </button>
             @endauth
@@ -128,7 +128,7 @@
                 <form action="{{ route('songs.destroy', $song) }}" method="POST" onsubmit="return confirm('Delete this track?');">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="w-10 h-10 px-2 flex items-center justify-center bg-[#1a2730] rounded-none border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-red-500 hover:border-red-500/20 transition-all">
+                    <button type="submit" class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-red-500 hover:border-red-500/20 transition-all">
                         <ion-icon name="trash-outline" class="w-4 h-4"></ion-icon>
                     </button>
                 </form>
@@ -160,10 +160,10 @@
                         @csrf
                         <div class="flex gap-2">
                             <textarea name="body" id="comment-body" rows="1" maxlength="250" oninput="updateCharCount()"
-                                class="flex-1 bg-[#1a2730]/40 border border-[#53a1b3]/10 text-white/80 text-[12px] p-2 focus:outline-none focus:border-[#e96c4c]/30 transition-all placeholder-[#53a1b3]/10 resize-none max-h-[35px] font-light leading-tight"
+                                class="flex-1 bg-[#1a2730]/40 border border-[#53a1b3]/10 text-white/80 text-[12px] p-2 focus:outline-none focus:border-[#e96c4c]/30 transition-all placeholder-[#53a1b3]/10 resize-none max-h-[35px] font-light leading-tight rounded-[3px]"
                                 placeholder="Write a review..."></textarea>
 
-                            <button type="submit" class="h-10 px-3 flex items-center justify-center bg-[#e96c4c] rounded-none border border-[#e96c4c] text-white hover:bg-[#e96c4c]/90 transition shrink-0">
+                            <button type="submit" class="px-4 py-2 flex items-center justify-center bg-[#e96c4c] rounded-[3px] border border-[#e96c4c] text-white hover:bg-[#e96c4c]/90 transition shrink-0">
                                 <ion-icon name="arrow-up" class="w-4 h-4"></ion-icon>
                             </button>
                         </div>
@@ -426,90 +426,114 @@
             document.body.style.overflow = 'auto';
         }
 
-        function addToPlaylist(playlistSlug) {
+        async function addToPlaylist(playlistSlug) {
             const songId = {{ $song->id }};
 
-            fetch(`/playlists/${playlistSlug}/songs`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({ song_id: songId })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error(`HTTP ${response.status}: ${text}`);
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
+            try {
+                const response = await fetch(`/playlists/${playlistSlug}/songs`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ song_id: songId })
+                });
+
+                const data = await response.json();
                 if(data.success) {
                     alert('Song added to playlist!');
                     closePlaylistModal();
                 } else {
                     alert(data.message || 'Failed to add song to playlist');
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred: ' + error.message);
-            });
+                alert('An error occurred');
+            }
+        }
+
+        async function createNewPlaylistInline() {
+            const nameInput = document.getElementById('inline-playlist-name');
+            const name = nameInput.value.trim();
+            if (!name) return;
+
+            const saveBtn = nameInput.nextElementSibling;
+            saveBtn.disabled = true;
+            saveBtn.innerText = '...';
+
+            try {
+                // 1. Create Playlist
+                const createResponse = await fetch('/playlists', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ name: name, is_public: 1 })
+                });
+
+                const createData = await createResponse.json();
+
+                if (createResponse.ok && createData.slug) {
+                    // 2. Add current song to newly created playlist
+                    await addToPlaylist(createData.slug);
+                } else {
+                    alert(createData.message || 'Error creating playlist');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerText = 'Save';
+            }
         }
     </script>
 
     <!-- Playlist Modal -->
     @auth
-    <div id="playlist-modal" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4" onclick="if(event.target === this) closePlaylistModal()">
-        <div class="bg-[#213042] w-full max-w-md max-h-[80vh] overflow-y-auto">
+    <div id="playlist-modal" class="hidden fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4" onclick="if(event.target === this) closePlaylistModal()">
+        <div class="bg-[#1a2730] w-[300px] shadow-2xl overflow-hidden border border-[#53a1b3]/10 rounded-[3px]">
             <!-- Header -->
-            <div class="sticky top-0 bg-[#213042] border-b border-[#53a1b3]/10 p-4 flex items-center justify-between">
-                <h3 class="text-white font-normal text-base uppercase tracking-wider">Add to Playlist</h3>
-                <button onclick="closePlaylistModal()" class="text-[#53a1b3] hover:text-white transition">
-                    <ion-icon name="close-outline" class="w-6 h-6"></ion-icon>
+            <div class="p-2 pb-0">
+                <h3 class="text-white text-[13px] font-normal uppercase tracking-wider">Playlist</h3>
+                <div class="h-0.5 w-10 bg-[#e96c4c] mt-1.5"></div>
+            </div>
+            
+            <div class="border-t border-[#53a1b3]/10 mt-2"></div>
+
+            <!-- Create Inline -->
+            <div class="p-2 flex items-center gap-2">
+                <input type="text" id="inline-playlist-name" placeholder="CREATE NEW PLAYLIST" 
+                    class="flex-1 bg-[#141e24] border border-[#53a1b3]/10 text-white text-xs p-2 focus:ring-1 focus:ring-[#e96c4c]/30 focus:outline-none placeholder-[#53a1b3]/20 uppercase tracking-tighter rounded-[3px]">
+                <button onclick="createNewPlaylistInline()" class="bg-[#e96c4c] px-4 py-2 text-xs text-white hover:bg-[#e96c4c]/90 transition flex-shrink-0 uppercase font-medium rounded-[3px]">
+                    Save
                 </button>
             </div>
 
-            <!-- Create New Playlist -->
-            <div class="p-4 border-b border-[#53a1b3]/10">
-                <a href="{{ route('playlists.create') }}" class="flex items-center gap-3 p-3 bg-[#141e24] hover:bg-[#1a2834] transition">
-                    <div class="w-10 h-10 bg-[#e96c4c] flex items-center justify-center">
-                        <ion-icon name="add-outline" class="w-6 h-6 text-white"></ion-icon>
-                    </div>
-                    <span class="text-white text-sm font-normal uppercase tracking-wider">Create New Playlist</span>
-                </a>
-            </div>
-
-            <!-- Playlists List -->
-            <div class="p-4 space-y-2">
+            <!-- Playlist List -->
+            <div class="px-2 pb-2 flex flex-col gap-1.5 max-h-[200px] overflow-y-auto">
                 @php
-                    $userPlaylists = auth()->user()->playlists;
+                    $userPlaylists = auth()->user()->playlists->merge(auth()->user()->collaboratedPlaylists);
                 @endphp
 
-                @if($userPlaylists->isEmpty())
-                    <p class="text-[#53a1b3] text-sm text-center py-8">You don't have any playlists yet.</p>
-                @else
-                    @foreach($userPlaylists as $playlist)
-                    <button onclick="addToPlaylist('{{ $playlist->slug }}')" class="w-full flex items-center gap-3 p-3 bg-[#141e24] hover:bg-[#1a2834] transition text-left">
-                        @if($playlist->cover_path)
-                            <div class="w-10 h-10 flex-shrink-0 overflow-hidden">
-                                <img src="{{ Storage::url($playlist->cover_path) }}" alt="{{ $playlist->name }}" class="w-full h-full object-cover">
-                            </div>
-                        @else
-                            <div class="w-10 h-10 bg-[#213042] flex-shrink-0 flex items-center justify-center">
-                                <ion-icon name="list-outline" class="w-5 h-5 text-[#53a1b3]"></ion-icon>
-                            </div>
-                        @endif
-                        <div class="flex-1 min-w-0">
-                            <p class="text-white text-sm font-normal truncate">{{ $playlist->name }}</p>
-                            <p class="text-[#53a1b3] text-xs">{{ $playlist->songs()->count() }} songs</p>
-                        </div>
-                    </button>
-                    @endforeach
-                @endif
+                @foreach($userPlaylists as $playlist)
+                <button onclick="addToPlaylist('{{ $playlist->slug }}')" class="w-full flex items-center gap-2.5 px-4 py-2 bg-[#141e24] border border-[#53a1b3]/5 hover:border-[#e96c4c]/30 transition text-left group rounded-[3px]">
+                    <ion-icon name="add-outline" class="w-4 h-4 text-[#53a1b3]/40 group-hover:text-[#e96c4c]"></ion-icon>
+                    <span class="text-white/80 text-xs uppercase tracking-wide truncate">{{ $playlist->name }}</span>
+                </button>
+                @endforeach
+            </div>
+
+            <div class="border-t border-[#53a1b3]/10 mt-1"></div>
+
+            <!-- Footer -->
+            <div class="p-2 flex justify-end">
+                <button onclick="closePlaylistModal()" class="border border-[#53a1b3]/20 text-[#53a1b3] hover:text-white px-4 py-2 text-xs uppercase tracking-widest transition rounded-[3px]">
+                    Close
+                </button>
             </div>
         </div>
     </div>

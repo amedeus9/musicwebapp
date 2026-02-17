@@ -69,15 +69,15 @@
                 <!-- Home -->
                 <a href="{{ route('home') }}" class="flex flex-col items-center gap-1 p-2 group {{ request()->routeIs('home') ? 'text-[#e96c4c]' : 'text-[#53a1b3] opacity-60 hover:opacity-100' }}">
                     <div class="w-6 h-6 flex items-center justify-center transition group-active:scale-90">
-                        <ion-icon name="musical-notes-outline" class="w-5 h-5"></ion-icon>
+                        <ion-icon name="musical-notes-outline" class="w-4 h-4"></ion-icon>
                     </div>
                     <span class="text-[8px] font-normal uppercase tracking-tighter">Home</span>
                 </a>
 
                 <!-- Browse -->
-                <a href="{{ route('songs.index') }}" class="flex flex-col items-center gap-1 p-2 group {{ request()->routeIs('songs.index') ? 'text-[#e96c4c]' : 'text-[#53a1b3] opacity-60 hover:opacity-100' }}">
+                <a href="{{ route('songs.index') }}" class="flex flex-col items-center gap-1 p-2 group {{ (request()->routeIs('songs.index') || request()->routeIs('songs.show') || request()->routeIs('artists.show')) ? 'text-[#e96c4c]' : 'text-[#53a1b3] opacity-60 hover:opacity-100' }}">
                     <div class="w-6 h-6 flex items-center justify-center transition group-active:scale-90">
-                        <ion-icon name="globe-outline" class="w-5 h-5"></ion-icon>
+                        <ion-icon name="globe-outline" class="w-4 h-4"></ion-icon>
                     </div>
                     <span class="text-[8px] font-normal uppercase tracking-tighter">Browse</span>
                 </a>
@@ -85,7 +85,7 @@
                 <!-- Playlists (Center) -->
                 <a href="{{ route('playlists.index') }}" class="flex flex-col items-center gap-1 p-2 group {{ request()->routeIs('playlists.*') ? 'text-[#e96c4c]' : 'text-[#53a1b3] opacity-60 hover:opacity-100' }}">
                     <div class="w-6 h-6 flex items-center justify-center transition group-active:scale-90">
-                        <ion-icon name="list-outline" class="w-5 h-5"></ion-icon>
+                        <ion-icon name="list-outline" class="w-4 h-4"></ion-icon>
                     </div>
                     <span class="text-[8px] font-normal uppercase tracking-tighter">Playlists</span>
                 </a>
@@ -93,7 +93,7 @@
                 <!-- Favorites -->
                 <a href="{{ route('favorites') }}" class="flex flex-col items-center gap-1 p-2 group {{ request()->routeIs('favorites') ? 'text-[#e96c4c]' : 'text-[#53a1b3] opacity-60 hover:opacity-100' }}">
                     <div class="w-6 h-6 flex items-center justify-center transition group-active:scale-90">
-                        <ion-icon name="heart-outline" class="w-5 h-5"></ion-icon>
+                        <ion-icon name="heart-outline" class="w-4 h-4"></ion-icon>
                     </div>
                     <span class="text-[8px] font-normal uppercase tracking-tighter">Favorites</span>
                 </a>
@@ -103,14 +103,14 @@
                     @if(auth()->user()->isAdmin())
                     <a href="{{ route('admin.dashboard') }}" class="flex flex-col items-center gap-1 p-2 group {{ request()->routeIs('admin.*') ? 'text-[#e96c4c]' : 'text-[#53a1b3] opacity-60 hover:opacity-100' }}">
                         <div class="w-6 h-6 flex items-center justify-center transition group-active:scale-90">
-                            <ion-icon name="shield-checkmark-outline" class="w-5 h-5"></ion-icon>
+                            <ion-icon name="shield-checkmark-outline" class="w-4 h-4"></ion-icon>
                         </div>
                         <span class="text-[8px] font-normal uppercase tracking-tighter">Admin</span>
                     </a>
                     @else
-                    <a href="{{ route('profile') }}" class="flex flex-col items-center gap-1 p-2 group {{ request()->routeIs('profile') ? 'text-[#e96c4c]' : 'text-[#53a1b3] opacity-60 hover:opacity-100' }}">
+                    <a href="{{ route('profile') }}" class="flex flex-col items-center gap-1 p-2 group {{ request()->routeIs('profile*') ? 'text-[#e96c4c]' : 'text-[#53a1b3] opacity-60 hover:opacity-100' }}">
                         <div class="w-6 h-6 flex items-center justify-center transition group-active:scale-90">
-                            <ion-icon name="person-outline" class="w-5 h-5"></ion-icon>
+                            <ion-icon name="person-outline" class="w-4 h-4"></ion-icon>
                         </div>
                         <span class="text-[8px] font-normal uppercase tracking-tighter">Profile</span>
                     </a>
@@ -118,7 +118,7 @@
                 @else
                 <a href="{{ route('login') }}" class="flex flex-col items-center gap-1 p-2 group {{ request()->routeIs('login') ? 'text-[#e96c4c]' : 'text-[#53a1b3] opacity-60 hover:opacity-100' }}">
                     <div class="w-6 h-6 flex items-center justify-center transition group-active:scale-90">
-                        <ion-icon name="log-in-outline" class="w-5 h-5"></ion-icon>
+                        <ion-icon name="log-in-outline" class="w-4 h-4"></ion-icon>
                     </div>
                     <span class="text-[8px] font-normal uppercase tracking-tighter">Login</span>
                 </a>

@@ -15,7 +15,7 @@ class PlaylistController extends Controller
             // Show user's playlists
             /** @var \App\Models\User $user */
             $user = Auth::user();
-            $playlists = $user->playlists()->latest()->get();
+            $playlists = $user->playlists->merge($user->collaboratedPlaylists)->sortByDesc('created_at');
         } else {
             // Show public playlists
             $playlists = Playlist::where('is_public', true)->latest()->take(20)->get();
@@ -122,8 +122,8 @@ class PlaylistController extends Controller
 
     public function addSong(Request $request, Playlist $playlist)
     {
-        // Check ownership
-        if (Auth::id() !== $playlist->user_id) {
+        // Check ownership or collaboration
+        if (Auth::id() !== $playlist->user_id && !$playlist->collaborators->contains(Auth::id())) {
             if ($request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
             }
@@ -176,13 +176,51 @@ class PlaylistController extends Controller
 
     public function removeSong(Playlist $playlist, Song $song)
     {
-        // Check ownership
-        if (Auth::id() !== $playlist->user_id) {
+        // Check ownership or collaboration
+        if (Auth::id() !== $playlist->user_id && !$playlist->collaborators->contains(Auth::id())) {
             abort(403, 'Unauthorized action.');
         }
 
         $playlist->songs()->detach($song->id);
 
         return back()->with('success', 'Song removed from playlist!');
+    }
+
+    public function invite(Request $request, Playlist $playlist)
+    {
+        // Check ownership
+        if (Auth::id() !== $playlist->user_id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        $user = \App\Models\User::where('email', $request->email)->first();
+
+        if ($user->id === $playlist->user_id) {
+            return back()->with('error', 'You cannot invite yourself.');
+        }
+
+        if ($playlist->collaborators()->where('user_id', $user->id)->exists()) {
+            return back()->with('error', 'User is already a collaborator.');
+        }
+
+        $playlist->collaborators()->attach($user->id);
+
+        return back()->with('success', 'Collaborator invited successfully!');
+    }
+
+    public function removeCollaborator(Playlist $playlist, \App\Models\User $user)
+    {
+        // Check ownership
+        if (Auth::id() !== $playlist->user_id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $playlist->collaborators()->detach($user->id);
+
+        return back()->with('success', 'Collaborator removed successfully!');
     }
 }

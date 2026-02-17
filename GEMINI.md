@@ -229,3 +229,4 @@ protected function isAccessible(User $user, ?string $path = null): bool
 @section('content')
 <div class="flex-1 flex flex-col overflow-y-auto pb-24 gap-1">
     
+

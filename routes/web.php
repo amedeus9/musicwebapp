@@ -46,6 +46,8 @@ Route::put('/playlists/{playlist:slug}', [PlaylistController::class, 'update'])-
 Route::delete('/playlists/{playlist:slug}', [PlaylistController::class, 'destroy'])->name('playlists.destroy')->middleware('auth');
 Route::post('/playlists/{playlist:slug}/songs', [PlaylistController::class, 'addSong'])->name('playlists.addSong')->middleware('auth');
 Route::delete('/playlists/{playlist:slug}/songs/{song}', [PlaylistController::class, 'removeSong'])->name('playlists.removeSong')->middleware('auth');
+Route::post('/playlists/{playlist:slug}/invite', [PlaylistController::class, 'invite'])->name('playlists.invite')->middleware('auth');
+Route::delete('/playlists/{playlist:slug}/collaborators/{user}', [PlaylistController::class, 'removeCollaborator'])->name('playlists.removeCollaborator')->middleware('auth');
 
 // Authentication Routes
 use App\Http\Controllers\Auth\LoginController;
