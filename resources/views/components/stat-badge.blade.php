@@ -1,14 +1,22 @@
 @props([
-    'icon',            // ionicon name e.g. 'download-outline'
-    'value',           // the count/number to display
-    'iconColor' => 'text-[#53a1b3]',
+    'icon',            
+    'value',           
+    'color' => '#53a1b3', // Default color
 ])
 
-<div class="flex items-center h-4 border border-[#53a1b3]/20 overflow-hidden">
-    <div class="bg-[#141e24] px-1.5 h-full flex items-center justify-center border-r border-[#53a1b3]/10">
-        <ion-icon name="{{ $icon }}" class="w-2 h-2 {{ $iconColor }}"></ion-icon>
+@php
+    // We can use the hex color for border and background opacity
+    // If the user passes a Tailwind class name instead of hex, it might break inline styles,
+    // so we assume hex or standard color names for this simplified premium component.
+    $borderColor = str_contains($color, '#') ? $color . '33' : $color; // Adding 33 for ~20% opacity
+    $bgColor = str_contains($color, '#') ? $color . '1a' : $color;    // Adding 1a for ~10% opacity
+@endphp
+
+<div class="flex items-center h-4 border overflow-hidden" style="border-color: {{ $borderColor }}">
+    <div class="bg-[#141e24] px-1.5 h-full flex items-center justify-center border-r" style="border-color: {{ $bgColor }}">
+        <ion-icon name="{{ $icon }}" class="w-2 h-2" style="color: {{ $color }}"></ion-icon>
     </div>
-    <div class="bg-[#53a1b3]/10 px-1.5 h-full flex items-center justify-center text-[9px] font-normal text-[#53a1b3] font-mono">
+    <div class="px-1.5 h-full flex items-center justify-center text-[9px] font-normal font-mono" style="background-color: {{ $bgColor }}; color: {{ $color }}">
         {{ is_numeric($value) ? number_format($value) : $value }}
     </div>
 </div>

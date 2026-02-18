@@ -11,7 +11,7 @@ class AlbumController extends Controller
      */
     public function index()
     {
-        $albums = \App\Models\Album::with('artistProfile')->latest()->simplePaginate(20);
+        $albums = \App\Models\Album::with('artistProfile')->latest()->paginate(20);
 
         return view('albums.index', compact('albums'));
     }

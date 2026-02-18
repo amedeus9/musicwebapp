@@ -32,7 +32,7 @@ class SongController extends Controller
             $query->where('country_id', $request->country_id);
         }
 
-        $songs = $query->with(['country', 'artistProfile', 'album'])->latest()->simplePaginate(20);
+        $songs = $query->with(['country', 'artistProfile', 'album'])->latest()->paginate(20);
 
         if ($request->ajax()) {
             return view('songs.partials.list', compact('songs'));

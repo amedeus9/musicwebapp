@@ -715,8 +715,9 @@
             });
         }
     </script>
-    <!-- Global Confirmation Modal -->
+    <!-- Global Interaction Components -->
     <x-confirm-modal />
+    <x-bottom-sheet />
 
     <!-- Ionicons -->
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>

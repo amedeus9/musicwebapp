@@ -1,16 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="flex flex-col gap-2">
-
-    <!-- Song List (Full Width) -->
-    <div class="px-2 pt-2 text-[#53a1b3] font-normal text-xs uppercase tracking-wider mb-2 flex items-center justify-between">
-        <span>All Songs</span>
-        <span class="text-[10px] opacity-50">{{ $songs->count() }} Tracks</span>
-    </div>
+<div class="flex flex-col gap-0">
 
     <!-- Song List (Condensed) -->
-    <div id="songs-container" class="flex flex-col min-h-[50vh]">
+    <div id="songs-container" class="flex flex-col gap-2 min-h-[50vh]">
         @if($songs->count() > 0)
             @include('songs.partials.list')
         @else
@@ -65,8 +59,8 @@
 
             // Get song data from the row
             const row = button.closest('.group');
-            const title = row.querySelector('h3')?.textContent || 'Unknown';
-            const artist = row.querySelector('p')?.textContent || 'Unknown';
+            const title = row.querySelector('.song-title')?.textContent.trim() || 'Unknown';
+            const artist = row.querySelector('.song-artist')?.textContent.trim() || 'Unknown';
             const cover = row.querySelector('img')?.src || '';
 
             if (currentAudio && currentAudio !== audio) {
