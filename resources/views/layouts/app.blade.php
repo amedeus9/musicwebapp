@@ -144,7 +144,7 @@
     </div>
 
     <!-- Auth Modal -->
-    <div id="auth-modal" onclick="closeAuthModal(event)" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-start justify-center pt-64 p-4 backdrop-blur-sm transition-opacity">
+    <div id="auth-modal" onclick="closeAuthModal(event)" class="hidden fixed inset-0 bg-black/50 z-[100] flex items-start justify-center pt-64 p-4 transition-opacity">
         <div onclick="event.stopPropagation()" class="w-[350px] bg-[#1a2730] shadow-2xl rounded-[3px] overflow-hidden border border-[#53a1b3]/10 flex flex-col">
             
             <!-- Header (Tabs) -->
@@ -535,7 +535,189 @@
                 loginIndicator.parentElement.classList.remove('text-white');
             }
         }
+
+        // Global AJAX Like Toggle
+        async function toggleLike(type, id, btn) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+            try {
+                const response = await fetch(`/interactions/${type}/${id}/like`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                });
+
+                if (response.status === 302 || response.redirected) {
+                    // Not logged in — redirect to login
+                    window.location.href = '/login';
+                    return;
+                }
+
+                const data = await response.json();
+                const liked = data.liked;
+
+                // Find the icon: either inside the passed btn, or by common IDs
+                const icon = btn ? btn.querySelector('.like-icon, ion-icon') : null;
+
+                if (liked) {
+                    if (icon) icon.setAttribute('name', 'heart');
+                    if (btn) {
+                        btn.classList.add('text-red-500');
+                        btn.classList.remove('text-[#53a1b3]/40', 'text-[#53a1b3]');
+                    }
+                    // Also update song page specific buttons
+                    ['like-icon-song-desktop', 'like-icon-song-mobile', 'like-icon-album'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.setAttribute('name', 'heart');
+                    });
+                    ['like-btn-song-desktop', 'like-btn-song-mobile', 'like-btn-album'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) { el.classList.add('text-red-500'); el.classList.remove('text-[#53a1b3]/40', 'text-[#53a1b3]'); }
+                    });
+                } else {
+                    if (icon) icon.setAttribute('name', 'heart-outline');
+                    if (btn) {
+                        btn.classList.remove('text-red-500');
+                        btn.classList.add('text-[#53a1b3]/40');
+                    }
+                    ['like-icon-song-desktop', 'like-icon-song-mobile', 'like-icon-album'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.setAttribute('name', 'heart-outline');
+                    });
+                    ['like-btn-song-desktop', 'like-btn-song-mobile', 'like-btn-album'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) { el.classList.remove('text-red-500'); el.classList.add('text-[#53a1b3]/40'); }
+                    });
+                }
+            } catch (e) {
+                console.error('Like failed:', e);
+            }
+        }
+
+        // Global char counter (used by comments component)
+        function updateCharCount(listId) {
+            const textarea = document.getElementById('comment-body-' + listId)
+                          || document.getElementById('comment-body');
+            const counter  = document.getElementById('char-count-' + listId)
+                          || document.getElementById('char-count');
+            if (textarea && counter) {
+                counter.textContent = 250 - textarea.value.length;
+            }
+        }
+
+        // Global AJAX Comment Submit
+        async function submitComment(type, id, listId) {
+            const textarea = document.getElementById('comment-body-' + listId)
+                          || document.getElementById('comment-body');
+            const body = textarea ? textarea.value.trim() : '';
+            if (!body) return;
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+            try {
+                const response = await fetch(`/interactions/${type}/${id}/comment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ body })
+                });
+
+                if (response.redirected || response.status === 302) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                const data = await response.json();
+                if (!data.success) return;
+
+                const c = data.comment;
+                const list = document.getElementById(listId);
+                if (!list) return;
+
+                // Hide empty state
+                const noComments = list.querySelector('[id^="no-comments"]');
+                if (noComments) noComments.remove();
+
+                // Build comment HTML
+                const div = document.createElement('div');
+                div.id = `comment-${c.id}`;
+                div.className = 'overflow-hidden';
+                div.innerHTML = `
+                    <div class="flex gap-2">
+                        <div class="w-10 h-10 bg-[#53a1b3]/10 flex items-center justify-center shrink-0 rounded-[3px]">
+                            <span class="text-[#53a1b3]/40 text-sm font-normal uppercase">${c.user_name.charAt(0)}</span>
+                        </div>
+                        <div class="flex-1 min-w-0 overflow-hidden">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-[#e96c4c] text-[11px] font-normal uppercase truncate">${c.user_name}</span>
+                                <div class="flex items-center gap-2 shrink-0 ml-2">
+                                    <span class="text-[#53a1b3]/30 text-[9px] uppercase">${c.created_at}</span>
+                                    <button onclick="deleteComment(${c.id}, this)" class="text-[#53a1b3]/30 hover:text-red-500 transition">
+                                        <ion-icon name="trash-outline" class="w-3.5 h-3.5"></ion-icon>
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="text-white/90 text-[13px] leading-relaxed font-light break-all overflow-hidden">${c.body}</p>
+                        </div>
+                    </div>
+                `;
+
+                list.insertBefore(div, list.firstChild);
+                textarea.value = '';
+
+                const charCount = document.getElementById('char-count-' + listId)
+                               || document.getElementById('char-count');
+                if (charCount) charCount.textContent = '250';
+
+            } catch (e) {
+                console.error('Comment submit failed:', e);
+            }
+        }
+
+        // Global AJAX Comment Delete
+        async function deleteComment(commentId, btn) {
+            confirmAction({
+                title: 'Delete Comment',
+                message: 'Are you sure you want to delete this comment? This action cannot be undone.',
+                confirmLabel: 'Delete',
+                icon: 'trash-outline',
+                danger: true,
+                onConfirm: async () => {
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+                    try {
+                        const response = await fetch(`/interactions/comment/${commentId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            }
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            const commentEl = document.getElementById(`comment-${commentId}`);
+                            if (commentEl) {
+                                commentEl.style.transition = 'opacity 0.3s';
+                                commentEl.style.opacity = '0';
+                                setTimeout(() => commentEl.remove(), 300);
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Delete comment failed:', e);
+                    }
+                }
+            });
+        }
     </script>
+    <!-- Global Confirmation Modal -->
+    <x-confirm-modal />
+
     <!-- Ionicons -->
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>

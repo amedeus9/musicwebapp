@@ -83,10 +83,14 @@
                                 <a href="{{ route('admin.songs.edit', $song->id) }}" class="text-[#53a1b3] hover:text-[#e96c4c] transition" title="Edit">
                                     <ion-icon name="create-outline" class="w-5 h-5"></ion-icon>
                                 </a>
-                                <form action="{{ route('admin.songs.destroy', $song->id) }}" method="POST" onsubmit="return confirm('Delete this song? This action cannot be undone.');" class="inline">
+                                <form id="admin-del-song-{{ $song->id }}" action="{{ route('admin.songs.destroy', $song->id) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-[#53a1b3] hover:text-red-500 transition" title="Delete">
+                                    <button type="button"
+                                        data-confirm="Delete this song? This action cannot be undone."
+                                        data-confirm-title="Delete Song"
+                                        data-confirm-form="admin-del-song-{{ $song->id }}"
+                                        class="text-[#53a1b3] hover:text-red-500 transition" title="Delete">
                                         <ion-icon name="trash-outline" class="w-5 h-5"></ion-icon>
                                     </button>
                                 </form>
@@ -130,10 +134,14 @@
                     <a href="{{ route('admin.songs.edit', $song->id) }}" class="flex-1 bg-[#e96c4c] hover:bg-[#e96c4c]/90 text-white px-3 py-2 text-xs uppercase tracking-wider text-center transition">
                         Edit
                     </a>
-                    <form action="{{ route('admin.songs.destroy', $song->id) }}" method="POST" onsubmit="return confirm('Delete this song?');" class="flex-1">
+                    <form id="admin-del-song-mob-{{ $song->id }}" action="{{ route('admin.songs.destroy', $song->id) }}" method="POST" class="flex-1">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="w-full bg-[#141e24] hover:bg-red-500 text-[#53a1b3] hover:text-white px-3 py-2 text-xs uppercase tracking-wider transition">
+                        <button type="button"
+                            data-confirm="Delete this song? This cannot be undone."
+                            data-confirm-title="Delete Song"
+                            data-confirm-form="admin-del-song-mob-{{ $song->id }}"
+                            class="w-full bg-[#141e24] hover:bg-red-500 text-[#53a1b3] hover:text-white px-3 py-2 text-xs uppercase tracking-wider transition">
                             Delete
                         </button>
                     </form>

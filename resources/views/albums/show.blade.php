@@ -42,12 +42,9 @@
             <ion-icon name="play-outline" class="w-6 h-6 ml-1"></ion-icon>
         </button>
 
-        <form action="{{ route('interactions.like', ['type' => 'album', 'id' => $album->id]) }}" method="POST">
-            @csrf
-            <button type="submit" class="w-10 h-10 border border-white/5 flex items-center justify-center {{ $album->likes()->where('user_id', auth()->id())->exists() ? 'bg-red-600/20 text-red-500' : 'bg-[#141e24] text-[#53a1b3]' }} hover:bg-red-600/10 transition">
-                <ion-icon name="{{ $album->likes()->where('user_id', auth()->id())->exists() ? 'heart' : 'heart-outline' }}" class="w-5 h-5"></ion-icon>
-            </button>
-        </form>
+        <button onclick="toggleLike('album', {{ $album->id }}, this)" id="like-btn-album" class="w-10 h-10 border border-white/5 flex items-center justify-center transition {{ $album->likes()->where('user_id', auth()->id())->exists() ? 'bg-red-600/20 text-red-500' : 'bg-[#141e24] text-[#53a1b3] hover:bg-red-600/10' }}">
+            <ion-icon id="like-icon-album" name="{{ $album->likes()->where('user_id', auth()->id())->exists() ? 'heart' : 'heart-outline' }}" class="w-5 h-5 like-icon"></ion-icon>
+        </button>
 
         <button class="w-10 h-10 border border-[#53a1b3]/30 rounded-none flex items-center justify-center text-[#53a1b3] hover:text-white hover:border-white transition">
             <ion-icon name="ellipsis-horizontal-outline" class="w-5 h-5"></ion-icon>
@@ -85,38 +82,13 @@
             </div>
         </h3>
 
-        <!-- Comment Form -->
-        @auth
-        <form action="{{ route('interactions.comment', ['type' => 'album', 'id' => $album->id]) }}" method="POST" class="mb-8">
-            @csrf
-            <div class="relative">
-                <textarea name="body" rows="3" class="w-full bg-[#141e24] border border-[#53a1b3]/20 text-white text-sm p-4 focus:outline-none focus:border-[#e96c4c]/50 transition placeholder-[#53a1b3]/40" placeholder="Give your thoughts on this album..."></textarea>
-                <button type="submit" class="mt-2 w-full bg-[#e96c4c]/10 border border-[#e96c4c]/20 py-3 text-[#e96c4c] text-xs uppercase tracking-widest hover:bg-[#e96c4c]/20 transition">Post Comment</button>
-            </div>
-        </form>
-        @else
-        <div class="bg-[#141e24] border border-[#53a1b3]/10 p-6 text-center mb-8">
-            <p class="text-[#53a1b3] text-xs">Please <a href="{{ route('login') }}" class="text-[#e96c4c] underline">login</a> to leave a comment or like this album.</p>
-        </div>
-        @endauth
-
-        <!-- Comments List -->
-        <div class="space-y-6">
-            @forelse($album->comments()->latest()->get() as $comment)
-            <div class="bg-[#141e24]/50 border-l-2 border-[#e96c4c]/30 p-4">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[#e96c4c] text-[11px] font-normal uppercase tracking-wider">{{ $comment->user->name }}</span>
-                    <span class="text-[#53a1b3]/50 text-[9px]">{{ $comment->created_at->diffForHumans() }}</span>
-                </div>
-                <p class="text-white/80 text-sm font-light leading-relaxed">{{ $comment->body }}</p>
-            </div>
-            @empty
-            <div class="text-center py-10 opacity-30">
-                <ion-icon name="chatbox-ellipses-outline" class="w-10 h-10 text-[#53a1b3] mb-3"></ion-icon>
-                <p class="text-[#53a1b3] text-xs uppercase tracking-widest">No review yet</p>
-            </div>
-            @endforelse
-        </div>
+        <x-comments
+            type="album"
+            :model-id="$album->id"
+            :comments="$album->comments()->with('user')->latest()->get()"
+            list-id="comments-list-album"
+            placeholder="Give your thoughts on this album..."
+        />
     </div>
 </div>
 @endsection

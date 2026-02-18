@@ -48,12 +48,9 @@
     <!-- Action Buttons -->
     <div class="flex items-center gap-2 shrink-0">
         <!-- Like Button -->
-        <form action="{{ route('interactions.like', ['type' => 'song', 'id' => $song->id]) }}" method="POST" class="inline">
-            @csrf
-            <button type="submit" class="w-8 h-8 flex items-center justify-center text-[#53a1b3]/40 hover:text-red-500 transition">
-                <ion-icon name="{{ $song->likes()->where('user_id', auth()->id())->exists() ? 'heart' : 'heart-outline' }}" class="w-4 h-4 {{ $song->likes()->where('user_id', auth()->id())->exists() ? 'text-red-500' : '' }}"></ion-icon>
-            </button>
-        </form>
+        <button onclick="toggleLike('song', {{ $song->id }}, this)" class="w-8 h-8 flex items-center justify-center transition {{ $song->likes()->where('user_id', auth()->id())->exists() ? 'text-red-500' : 'text-[#53a1b3]/40 hover:text-red-500' }}">
+            <ion-icon name="{{ $song->likes()->where('user_id', auth()->id())->exists() ? 'heart' : 'heart-outline' }}" class="w-4 h-4 like-icon"></ion-icon>
+        </button>
 
         <!-- Share Button -->
         <button type="button" onclick="shareSong('{{ $song->title }}', '{{ $song->artist }}', '{{ route('songs.show', $song) }}')" class="w-8 h-8 flex items-center justify-center text-[#53a1b3]/40 hover:text-white transition">

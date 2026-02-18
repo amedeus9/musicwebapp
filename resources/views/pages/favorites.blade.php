@@ -30,15 +30,8 @@
                             <div class="flex items-center gap-2">
                                 <p class="text-[11px] text-[#53a1b3] truncate">{{ $song->artist }}</p>
                                 
-                                <!-- Likes Count Badge -->
-                                <div class="flex items-center h-4 border border-[#53a1b3]/20 overflow-hidden">
-                                    <div class="bg-[#141e24] px-1.5 h-full flex items-center justify-center border-r border-[#53a1b3]/10">
-                                        <ion-icon name="heart" class="w-2 h-2 text-[#e96c4c]"></ion-icon>
-                                    </div>
-                                    <div class="bg-[#53a1b3]/10 px-1.5 h-full flex items-center justify-center text-[9px] font-normal text-[#53a1b3] font-mono">
-                                        {{ $song->likes()->count() }}
-                                    </div>
-                                </div>
+                                 <!-- Likes Count Badge -->
+                                 <x-stat-badge icon="heart" :value="$song->likes()->count()" icon-color="text-[#e96c4c]" />
                             </div>
                         </div>
                         
@@ -51,28 +44,22 @@
                     @endforeach
                 </div>
             @else
-                <div class="p-8 flex flex-col items-center justify-center gap-3">
-                    <div class="w-16 h-16 bg-[#213042] flex items-center justify-center">
-                        <ion-icon name="heart-outline" class="w-10 h-10 text-[#e96c4c]"></ion-icon>
-                    </div>
-                    <h4 class="text-white font-normal text-base">No Favorites Yet</h4>
-                    <p class="text-[#53a1b3] text-sm text-center max-w-xs">Songs you like will appear here. Start exploring and add your favorite music!</p>
-                    <a href="{{ route('songs.index') }}" class="mt-2 bg-[#e96c4c] hover:bg-[#e96c4c]/90 text-white px-4 py-2 text-xs font-normal uppercase tracking-wider transition">
-                        Browse Songs
-                    </a>
-                </div>
+                <x-empty-state
+                    icon="heart-outline"
+                    title="No Favorites Yet"
+                    message="Songs you like will appear here. Start exploring and add your favorite music!"
+                    action-label="Browse Songs"
+                    :action-url="route('songs.index')"
+                />
             @endif
         @else
-            <div class="bg-[#0f1319] p-8 flex flex-col items-center justify-center gap-3 border border-[#53a1b3]/20">
-                <div class="w-16 h-16 bg-[#213042] flex items-center justify-center">
-                    <ion-icon name="lock-closed-outline" class="w-10 h-10 text-[#e96c4c]"></ion-icon>
-                </div>
-                <h4 class="text-white font-normal text-base">Login Required</h4>
-                <p class="text-[#53a1b3] text-sm text-center max-w-xs">Please login to view and manage your favorite songs.</p>
-                <a href="{{ route('login') }}" class="mt-2 bg-[#e96c4c] hover:bg-[#e96c4c]/90 text-white px-4 py-2 text-xs font-normal uppercase tracking-wider transition">
-                    Login
-                </a>
-            </div>
+            <x-empty-state
+                icon="lock-closed-outline"
+                title="Login Required"
+                message="Please login to view and manage your favorite songs."
+                action-label="Login"
+                :action-url="route('login')"
+            />
         @endauth
     </div>
 

@@ -15,24 +15,13 @@
     </div>
 
     @if($playlists->isEmpty())
-        <div class="p-8 flex flex-col items-center justify-center gap-3">
-            <div class="w-16 h-16 bg-[#213042] flex items-center justify-center">
-                <ion-icon name="list-outline" class="w-10 h-10 text-[#e96c4c]"></ion-icon>
-            </div>
-            <h4 class="text-white font-normal text-base">No Playlists Yet</h4>
-            <p class="text-[#53a1b3] text-sm text-center max-w-xs">
-                @auth
-                    Create your first playlist and start organizing your favorite music!
-                @else
-                    No public playlists available right now.
-                @endauth
-            </p>
-            @auth
-            <a href="{{ route('playlists.create') }}" class="mt-2 bg-[#e96c4c] hover:bg-[#e96c4c]/90 text-white px-4 py-2 text-xs font-normal uppercase tracking-wider transition">
-                Create Playlist
-            </a>
-            @endauth
-        </div>
+        <x-empty-state
+            icon="list-outline"
+            title="No Playlists Yet"
+            :message="auth()->check() ? 'Create your first playlist and start organizing your favorite music!' : 'No public playlists available right now.'"
+            :action-label="auth()->check() ? 'Create Playlist' : null"
+            :action-url="auth()->check() ? route('playlists.create') : null"
+        />
     @else
         <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
             @foreach($playlists as $playlist)

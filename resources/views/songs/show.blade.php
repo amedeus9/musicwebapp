@@ -62,12 +62,9 @@
 
                 <!-- Icons Group -->
                 <div class="flex items-center gap-2 ml-0 md:ml-2">
-                    <form action="{{ route('interactions.like', ['type' => 'song', 'id' => $song->id]) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-red-500 hover:border-red-500/20 transition-all">
-                            <ion-icon name="{{ $song->likes()->where('user_id', auth()->id())->exists() ? 'heart' : 'heart-outline' }}" class="w-4 h-4 {{ $song->likes()->where('user_id', auth()->id())->exists() ? 'text-red-500' : '' }}"></ion-icon>
-                        </button>
-                    </form>
+                    <button onclick="toggleLike('song', {{ $song->id }})" id="like-btn-song-desktop" class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 hover:border-red-500/20 transition-all {{ $song->likes()->where('user_id', auth()->id())->exists() ? 'text-red-500' : 'text-[#53a1b3]/40' }}">
+                        <ion-icon id="like-icon-song-desktop" name="{{ $song->likes()->where('user_id', auth()->id())->exists() ? 'heart' : 'heart-outline' }}" class="w-4 h-4"></ion-icon>
+                    </button>
 
                     <button onclick="shareTrack()" class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-white hover:border-white/10 transition-all">
                         <ion-icon name="share-social-outline" class="w-4 h-4"></ion-icon>
@@ -80,10 +77,14 @@
                     @endauth
 
                     @if(auth()->check() && $song->user_id === auth()->id())
-                        <form action="{{ route('songs.destroy', $song) }}" method="POST" onsubmit="return confirm('Delete this track?');">
+                        <form id="delete-song-form-desktop" action="{{ route('songs.destroy', $song) }}" method="POST">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-red-500 hover:border-red-500/20 transition-all">
+                            <button type="button"
+                                data-confirm="Are you sure you want to delete this track? This cannot be undone."
+                                data-confirm-title="Delete Track"
+                                data-confirm-form="delete-song-form-desktop"
+                                class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-red-500 hover:border-red-500/20 transition-all">
                                 <ion-icon name="trash-outline" class="w-4 h-4"></ion-icon>
                             </button>
                         </form>
@@ -107,12 +108,9 @@
 
         <!-- Icons Group Mobile -->
         <div class="flex items-center gap-2 ml-auto">
-            <form action="{{ route('interactions.like', ['type' => 'song', 'id' => $song->id]) }}" method="POST">
-                @csrf
-                <button type="submit" class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-red-500 hover:border-red-500/20 transition-all">
-                    <ion-icon name="{{ $song->likes()->where('user_id', auth()->id())->exists() ? 'heart' : 'heart-outline' }}" class="w-4 h-4 {{ $song->likes()->where('user_id', auth()->id())->exists() ? 'text-red-500' : '' }}"></ion-icon>
-                </button>
-            </form>
+            <button onclick="toggleLike('song', {{ $song->id }})" id="like-btn-song-mobile" class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 hover:border-red-500/20 transition-all {{ $song->likes()->where('user_id', auth()->id())->exists() ? 'text-red-500' : 'text-[#53a1b3]/40' }}">
+                <ion-icon id="like-icon-song-mobile" name="{{ $song->likes()->where('user_id', auth()->id())->exists() ? 'heart' : 'heart-outline' }}" class="w-4 h-4"></ion-icon>
+            </button>
 
             <button onclick="shareTrack()" class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-white hover:border-white/10 transition-all">
                 <ion-icon name="share-social-outline" class="w-4 h-4"></ion-icon>
@@ -125,10 +123,14 @@
             @endauth
 
             @if(auth()->check() && $song->user_id === auth()->id())
-                <form action="{{ route('songs.destroy', $song) }}" method="POST" onsubmit="return confirm('Delete this track?');">
+                <form id="delete-song-form-mobile" action="{{ route('songs.destroy', $song) }}" method="POST">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-red-500 hover:border-red-500/20 transition-all">
+                    <button type="button"
+                        data-confirm="Are you sure you want to delete this track? This cannot be undone."
+                        data-confirm-title="Delete Track"
+                        data-confirm-form="delete-song-form-mobile"
+                        class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-red-500 hover:border-red-500/20 transition-all">
                         <ion-icon name="trash-outline" class="w-4 h-4"></ion-icon>
                     </button>
                 </form>
@@ -154,68 +156,13 @@
 
                 <div id="content-track" class="tab-content transition-all duration-300">
 
-                    <!-- Review Input -->
-                    @auth
-                    <form action="{{ route('interactions.comment', ['type' => 'song', 'id' => $song->id]) }}" method="POST" class="mt-2">
-                        @csrf
-                        <div class="flex gap-2">
-                            <textarea name="body" id="comment-body" rows="1" maxlength="250" oninput="updateCharCount()"
-                                class="flex-1 bg-[#1a2730]/40 border border-[#53a1b3]/10 text-white/80 text-[12px] p-2 focus:outline-none focus:border-[#e96c4c]/30 transition-all placeholder-[#53a1b3]/10 resize-none max-h-[35px] font-light leading-tight rounded-[3px]"
-                                placeholder="Write a review..."></textarea>
-
-                            <button type="submit" class="px-4 py-2 flex items-center justify-center bg-[#e96c4c] rounded-[3px] border border-[#e96c4c] text-white hover:bg-[#e96c4c]/90 transition shrink-0">
-                                <ion-icon name="arrow-up" class="w-4 h-4"></ion-icon>
-                            </button>
-                        </div>
-                        <div class="mt-1 text-right">
-                            <span class="text-[9px] text-[#53a1b3]/30"><span id="char-count">250</span></span>
-                        </div>
-                    </form>
-                    @else
-                    <div class="">
-                        <p class="text-[#53a1b3]/30 text-[10px] uppercase tracking-[0.2em]">Please <a href="{{ route('login') }}" class="text-[#e96c4c] hover:underline">login</a> to leave a review</p>
-                    </div>
-                    @endauth
-
-                    <!-- Comments Loop -->
-                    <div class="space-y-2">
-                        @forelse($song->comments()->latest()->get() as $comment)
-                        <div class="overflow-hidden">
-                            <div class="flex gap-2">
-                                <!-- Avatar Square -->
-                                <div class="w-10 h-10 bg-[#53a1b3]/10 flex items-center justify-center shrink-0">
-                                    <span class="text-[#53a1b3]/40 text-sm font-normal uppercase">{{ substr($comment->user->name, 0, 1) }}</span>
-                                </div>
-
-                                <!-- Comment Content -->
-                                <div class="flex-1 min-w-0 overflow-hidden">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <span class="text-[#e96c4c] text-[11px] font-normal uppercase truncate">{{ $comment->user->name }}</span>
-                                        <div class="flex items-center gap-2 shrink-0 ml-2">
-                                            <span class="text-[#53a1b3]/30 text-[9px] uppercase">{{ $comment->created_at->diffForHumans(['short' => true]) }}</span>
-                                            @if(auth()->check() && auth()->id() === $comment->user_id)
-                                                <form action="{{ route('interactions.deleteComment', $comment) }}" method="POST" onsubmit="return confirm('Delete this comment?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="text-[#53a1b3]/30 hover:text-red-500 transition">
-                                                        <ion-icon name="trash-outline" class="w-3.5 h-3.5"></ion-icon>
-                                                    </button>
-                                                </form>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <p class="text-white/90 text-[13px] leading-relaxed font-light break-all overflow-hidden">
-                                        {{ $comment->body }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        @empty
-                        <div class="py-12 text-center">
-                            <p class="text-[#53a1b3]/20 text-[10px] uppercase">No comments yet</p>
-                        </div>
-                        @endforelse
-                    </div>
+                    <x-comments
+                        type="song"
+                        :model-id="$song->id"
+                        :comments="$song->comments()->with('user')->latest()->get()"
+                        list-id="comments-list-song"
+                        placeholder="Write a review..."
+                    />
                 </div>
 
                 <div id="content-similar" class="tab-content hidden animate-fade-in">

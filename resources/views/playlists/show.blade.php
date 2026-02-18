@@ -59,10 +59,14 @@
                         <span class="pt-px hidden md:inline">EDIT</span>
                     </a>
 
-                    <form action="{{ route('playlists.destroy', $playlist->slug) }}" method="POST" onsubmit="return confirm('Delete this playlist?');">
+                    <form id="delete-playlist-form-desktop" action="{{ route('playlists.destroy', $playlist->slug) }}" method="POST">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="px-4 py-2 bg-[#1a2730] border border-[#53a1b3]/10 text-[#53a1b3]/70 flex items-center justify-center gap-2 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 transition-all rounded-[3px] text-xs uppercase">
+                        <button type="button"
+                            data-confirm="Are you sure you want to delete this playlist? All songs will be removed."
+                            data-confirm-title="Delete Playlist"
+                            data-confirm-form="delete-playlist-form-desktop"
+                            class="px-4 py-2 bg-[#1a2730] border border-[#53a1b3]/10 text-[#53a1b3]/70 flex items-center justify-center gap-2 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 transition-all rounded-[3px] text-xs uppercase">
                             <ion-icon name="trash-outline" class="w-4 h-4"></ion-icon>
                             <span class="pt-px hidden md:inline">DELETE</span>
                         </button>
@@ -97,10 +101,14 @@
                     <ion-icon name="create-outline" class="w-4 h-4"></ion-icon>
                 </a>
                 
-                <form action="{{ route('playlists.destroy', $playlist->slug) }}" method="POST" onsubmit="return confirm('Delete this playlist?');">
+                <form id="delete-playlist-form-mobile" action="{{ route('playlists.destroy', $playlist->slug) }}" method="POST">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-red-500 hover:border-red-500/20 transition-all">
+                    <button type="button"
+                        data-confirm="Are you sure you want to delete this playlist? All songs will be removed."
+                        data-confirm-title="Delete Playlist"
+                        data-confirm-form="delete-playlist-form-mobile"
+                        class="px-4 py-2 flex items-center justify-center bg-[#1a2730] rounded-[3px] border border-[#53a1b3]/5 text-[#53a1b3]/40 hover:text-red-500 hover:border-red-500/20 transition-all">
                         <ion-icon name="trash-outline" class="w-4 h-4"></ion-icon>
                     </button>
                 </form>
@@ -175,10 +183,14 @@
 
                                     @auth
                                     @if(Auth::id() === $playlist->user_id || $playlist->collaborators->contains(Auth::id()))
-                                        <form action="{{ route('playlists.removeSong', [$playlist->slug, $song->id]) }}" method="POST" onsubmit="return confirm('Remove this song?');">
+                                        <form id="remove-song-form-{{ $song->id }}" action="{{ route('playlists.removeSong', [$playlist->slug, $song->id]) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="w-8 h-8 flex items-center justify-center text-[#53a1b3] hover:text-red-500 transition">
+                                            <button type="button"
+                                                data-confirm="Remove this song from the playlist?"
+                                                data-confirm-title="Remove Song"
+                                                data-confirm-form="remove-song-form-{{ $song->id }}"
+                                                class="w-8 h-8 flex items-center justify-center text-[#53a1b3] hover:text-red-500 transition">
                                                 <ion-icon name="close-outline" class="w-4 h-4"></ion-icon>
                                             </button>
                                         </form>
@@ -196,66 +208,14 @@
                 <div id="content-comments" class="tab-content hidden transition-all duration-300">
                     <!-- Review Input -->
                     @auth
-                    <form action="{{ route('interactions.comment', ['type' => 'playlist', 'id' => $playlist->id]) }}" method="POST" class="mt-2">
-                        @csrf
-                        <div class="flex gap-2">
-                            <textarea name="body" id="comment-body" rows="1" maxlength="250" oninput="updateCharCount()"
-                                class="flex-1 bg-[#1a2730]/40 border border-[#53a1b3]/10 text-white/80 text-[12px] p-2 focus:outline-none focus:border-[#e96c4c]/30 transition-all placeholder-[#53a1b3]/10 resize-none h-[35px] font-light leading-tight rounded-[3px]"
-                                placeholder="Write a comment..."></textarea>
-
-                            <button type="submit" class="px-4 py-2 flex items-center justify-center bg-[#e96c4c] rounded-[3px] border border-[#e96c4c] text-white hover:bg-[#e96c4c]/90 transition shrink-0">
-                                <ion-icon name="arrow-up" class="w-4 h-4"></ion-icon>
-                            </button>
-                        </div>
-                        <div class="mt-1 text-right">
-                            <span class="text-[9px] text-[#53a1b3]/30"><span id="char-count">250</span></span>
-                        </div>
-                    </form>
-                    @else
-                    <div class="mt-4">
-                        <p class="text-[#53a1b3]/30 text-[10px] uppercase tracking-[0.2em]">Please <a href="{{ route('login') }}" class="text-[#e96c4c] hover:underline">login</a> to leave a comment</p>
-                    </div>
+                    <x-comments
+                        type="playlist"
+                        :model-id="$playlist->id"
+                        :comments="$playlist->comments()->with('user')->latest()->get()"
+                        list-id="comments-list-playlist"
+                        placeholder="Write a comment..."
+                    />
                     @endauth
-
-                    <!-- Comments Loop -->
-                    <div class="space-y-2 mt-4">
-                        @forelse($playlist->comments()->latest()->get() as $comment)
-                        <div class="overflow-hidden">
-                            <div class="flex gap-2">
-                                <!-- Avatar Square -->
-                                <div class="w-10 h-10 bg-[#53a1b3]/10 flex items-center justify-center shrink-0 rounded-[3px]">
-                                    <span class="text-[#53a1b3]/40 text-sm font-normal uppercase">{{ substr($comment->user->name, 0, 1) }}</span>
-                                </div>
-
-                                <!-- Comment Content -->
-                                <div class="flex-1 min-w-0 overflow-hidden">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <span class="text-[#e96c4c] text-[11px] font-normal uppercase truncate">{{ $comment->user->name }}</span>
-                                        <div class="flex items-center gap-2 shrink-0 ml-2">
-                                            <span class="text-[#53a1b3]/30 text-[9px] uppercase">{{ $comment->created_at->diffForHumans(['short' => true]) }}</span>
-                                            @if(auth()->check() && auth()->id() === $comment->user_id)
-                                                <form action="{{ route('interactions.deleteComment', $comment) }}" method="POST" onsubmit="return confirm('Delete this comment?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="text-[#53a1b3]/30 hover:text-red-500 transition">
-                                                        <ion-icon name="trash-outline" class="w-3.5 h-3.5"></ion-icon>
-                                                    </button>
-                                                </form>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <p class="text-white/90 text-[13px] leading-relaxed font-light break-all overflow-hidden">
-                                        {{ $comment->body }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        @empty
-                        <div class="py-12 text-center">
-                            <p class="text-[#53a1b3]/20 text-[10px] uppercase">No comments yet</p>
-                        </div>
-                        @endforelse
-                    </div>
                 </div>
 
                 <!-- COLLABORATORS TAB -->
@@ -295,10 +255,14 @@
                                 </div>
 
                                 <div class="flex items-center opacity-0 group-hover:opacity-100 transition">
-                                    <form action="{{ route('playlists.removeCollaborator', ['playlist' => $playlist->slug, 'user' => $collaborator->id]) }}" method="POST" onsubmit="return confirm('Remove this collaborator?');">
+                                    <form id="remove-collab-form-{{ $collaborator->id }}" action="{{ route('playlists.removeCollaborator', ['playlist' => $playlist->slug, 'user' => $collaborator->id]) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-[#53a1b3]/20 hover:text-red-500 transition" title="Remove Collaborator">
+                                        <button type="button"
+                                            data-confirm="Remove this collaborator from the playlist?"
+                                            data-confirm-title="Remove Collaborator"
+                                            data-confirm-form="remove-collab-form-{{ $collaborator->id }}"
+                                            class="text-[#53a1b3]/20 hover:text-red-500 transition" title="Remove Collaborator">
                                             <ion-icon name="close-circle-outline" class="w-4 h-4"></ion-icon>
                                         </button>
                                     </form>

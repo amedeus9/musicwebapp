@@ -79,10 +79,14 @@
                         <td class="px-4 py-3">
                             <div class="flex items-center justify-end gap-2">
                                 @if($user->id !== auth()->id())
-                                    <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Delete this user and all their content? This action cannot be undone.');" class="inline">
+                                    <form id="admin-del-user-{{ $user->id }}" action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-[#53a1b3] hover:text-red-500 transition" title="Delete">
+                                        <button type="button"
+                                            data-confirm="Delete this user and all their content? This cannot be undone."
+                                            data-confirm-title="Delete User"
+                                            data-confirm-form="admin-del-user-{{ $user->id }}"
+                                            class="text-[#53a1b3] hover:text-red-500 transition" title="Delete">
                                             <ion-icon name="trash-outline" class="w-5 h-5"></ion-icon>
                                         </button>
                                     </form>
@@ -128,10 +132,14 @@
                     </div>
                 </div>
                 @if($user->id !== auth()->id())
-                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Delete this user and all their content?');">
+                <form id="admin-del-user-mob-{{ $user->id }}" action="{{ route('admin.users.destroy', $user->id) }}" method="POST">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="w-full bg-[#141e24] hover:bg-red-500 text-[#53a1b3] hover:text-white px-3 py-2 text-xs uppercase tracking-wider transition">
+                    <button type="button"
+                        data-confirm="Delete this user and all their content?"
+                        data-confirm-title="Delete User"
+                        data-confirm-form="admin-del-user-mob-{{ $user->id }}"
+                        class="w-full bg-[#141e24] hover:bg-red-500 text-[#53a1b3] hover:text-white px-3 py-2 text-xs uppercase tracking-wider transition">
                         Delete User
                     </button>
                 </form>

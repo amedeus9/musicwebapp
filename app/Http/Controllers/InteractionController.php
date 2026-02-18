@@ -31,6 +31,14 @@ class InteractionController extends Controller
             $status = 'liked';
         }
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'liked'  => $status === 'liked',
+                'count'  => $model->likes()->count(),
+                'status' => $status,
+            ]);
+        }
+
         return back()->with('status', "Item $status successfully.");
     }
 
@@ -43,23 +51,45 @@ class InteractionController extends Controller
         $user = Auth::user();
         $model = $this->getModel($type, $id);
 
-        $model->comments()->create([
+        $comment = $model->comments()->create([
             'user_id' => $user->id,
-            'body' => $request->body,
+            'body'    => $request->body,
         ]);
+
+        $comment->load('user');
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'comment' => [
+                    'id'         => $comment->id,
+                    'body'       => $comment->body,
+                    'user_name'  => $comment->user->name,
+                    'created_at' => 'just now',
+                    'user_id'    => $comment->user_id,
+                ],
+            ]);
+        }
 
         return back()->with('status', 'Comment added successfully.');
     }
 
-    public function deleteComment(Comment $comment)
+    public function deleteComment(Request $request, Comment $comment)
     {
         $user = Auth::user();
 
         if ($comment->user_id !== $user->id) {
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+            }
             abort(403, 'Unauthorized action.');
         }
 
         $comment->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
 
         return back()->with('status', 'Comment deleted successfully.');
     }
