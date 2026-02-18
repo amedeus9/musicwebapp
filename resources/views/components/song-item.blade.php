@@ -10,7 +10,7 @@
 <div class="group relative flex items-center lg:grid lg:grid-cols-[1fr_20%_15%_200px] gap-4 transition duration-300">
     
     <!-- Track Info -->
-    <div class="flex items-center gap-3 min-w-0 flex-1 lg:flex-none">
+    <div class="flex items-center gap-2 min-w-0 flex-1 lg:flex-none">
         <!-- Cover Art (48px) -->
         <div class="relative w-12 h-12 shrink-0 bg-[#1a2730]/40 rounded-[3px] overflow-hidden border border-white/5">
             @if($song->cover_path)
@@ -95,11 +95,18 @@
             </button>
 
             <!-- Options (Mobile: Open Bottom Sheet) -->
-            <div class="relative group/menu">
+            <div class="relative group/menu lg:hidden">
                 <button onclick="triggerSongDetails({{ $song->id }})" class="w-8 h-8 flex items-center justify-center text-[#53a1b3]/40 hover:text-white transition rounded-[3px] hover:bg-white/5">
                     <ion-icon name="ellipsis-vertical" class="w-4 h-4"></ion-icon>
                 </button>
             </div>
+
+            <!-- Custom Actions Slot (Desktop) -->
+            @if(isset($actions))
+                <div class="hidden lg:flex items-center gap-1">
+                    {{ $actions }}
+                </div>
+            @endif
         </div>
     </div>
 
@@ -139,6 +146,13 @@
 
             <!-- Quick Actions List (Focused) -->
             <div class="flex flex-col gap-2">
+                @if(isset($actions))
+                    <div class="flex flex-col gap-2 mb-2">
+                        <label class="text-[9px] text-[#53a1b3]/30 uppercase tracking-[0.2em] px-1">Playlist Actions</label>
+                        {{ $actions }}
+                    </div>
+                @endif
+                
                 <a href="{{ route('songs.show', $song) }}" 
                     class="flex items-center gap-3 px-4 py-2 bg-white/5 text-white text-xs uppercase tracking-widest hover:bg-white/10 transition rounded-[3px]">
                     <ion-icon name="arrow-forward-outline" class="w-4 h-4 text-[#e96c4c]"></ion-icon>

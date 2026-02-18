@@ -13,6 +13,7 @@ Route::get('/albums', [AlbumController::class, 'index'])->name('albums.index');
 Route::get('/albums/{album:slug}', [AlbumController::class, 'show'])->name('albums.show');
 
 // Artist Routes
+Route::get('/artists', [ArtistController::class, 'index'])->name('artists.index');
 Route::get('/artists/{artist:slug}', [ArtistController::class, 'show'])->name('artists.show');
 
 // Song Routes

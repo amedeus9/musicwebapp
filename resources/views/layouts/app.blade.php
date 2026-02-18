@@ -90,7 +90,7 @@
                 </a>
 
                 <!-- Browse -->
-                <a href="{{ route('songs.index') }}" class="flex flex-col items-center gap-1 p-2 group {{ (request()->routeIs('songs.index') || request()->routeIs('songs.show') || request()->routeIs('artists.show')) ? 'text-[#e96c4c]' : 'text-[#53a1b3] opacity-60 hover:opacity-100' }}">
+                <a href="{{ route('songs.index') }}" class="flex flex-col items-center gap-1 p-2 group {{ (request()->routeIs('songs.index') || request()->routeIs('songs.show') || request()->routeIs('artists.*')) ? 'text-[#e96c4c]' : 'text-[#53a1b3] opacity-60 hover:opacity-100' }}">
                     <div class="w-6 h-6 flex items-center justify-center transition group-active:scale-90">
                         <ion-icon name="globe-outline" class="w-4 h-4"></ion-icon>
                     </div>
@@ -254,50 +254,9 @@
         </button>
     </div>
 
-    <!-- Global Player Bar -->
-    <div id="global-player" class="hidden fixed bottom-[70px] md:bottom-0 left-0 md:left-[250px] right-0 h-16 bg-[#1a2730] border-t border-[#53a1b3]/20 z-40 px-4">
-        <div class="max-w-7xl mx-auto h-full flex items-center gap-4">
-            <!-- Song Info -->
-            <div class="flex items-center gap-3 flex-1 min-w-0">
-                <img id="player-cover" src="" class="w-12 h-12 object-cover" alt="">
-                <div class="flex-1 min-w-0">
-                    <h4 id="player-title" class="text-white text-sm font-normal truncate">Song Title</h4>
-                    <p id="player-artist" class="text-[#53a1b3] text-xs truncate">Artist</p>
-                </div>
-            </div>
+    <x-player />
 
-            <!-- Controls -->
-            <div class="flex items-center gap-3">
-                <button id="player-prev" class="text-[#53a1b3] hover:text-white transition">
-                    <ion-icon name="play-back" class="w-5 h-5"></ion-icon>
-                </button>
-                <button id="player-play" class="w-10 h-10 bg-[#e96c4c] hover:bg-[#e96c4c]/90 text-white flex items-center justify-center transition">
-                    <ion-icon name="play" class="w-5 h-5"></ion-icon>
-                </button>
-                <button id="player-next" class="text-[#53a1b3] hover:text-white transition">
-                    <ion-icon name="play-forward" class="w-5 h-5"></ion-icon>
-                </button>
-            </div>
-
-            <!-- Progress -->
-            <div class="hidden md:flex items-center gap-2 flex-1">
-                <span id="player-current" class="text-[10px] text-[#53a1b3] font-mono">0:00</span>
-                <input id="player-seek" type="range" min="0" max="100" value="0" class="flex-1 h-1 bg-[#53a1b3]/20 appearance-none cursor-pointer accent-[#e96c4c]">
-                <span id="player-duration" class="text-[10px] text-[#53a1b3] font-mono">0:00</span>
-            </div>
-
-            <!-- Volume -->
-            <div class="hidden md:flex items-center gap-2">
-                <ion-icon name="volume-medium" class="w-5 h-5 text-[#53a1b3]"></ion-icon>
-                <input id="player-volume" type="range" min="0" max="100" value="100" class="w-20 h-1 bg-[#53a1b3]/20 appearance-none cursor-pointer accent-[#e96c4c]">
-            </div>
-        </div>
-
-        <!-- Mobile Progress Bar -->
-        <div class="md:hidden absolute top-0 left-0 right-0 h-0.5 bg-[#53a1b3]/20">
-            <div id="player-progress-mobile" class="h-full bg-[#e96c4c] w-0"></div>
-        </div>
-    </div>
+    <!-- Filter Bottom Sheet -->
 
     <!-- Filter Bottom Sheet -->
     <div id="filter-sheet" class="fixed inset-0 z-[60] hidden">
@@ -363,131 +322,7 @@
             }
         }
 
-        // Global Player Control
-        window.globalPlayer = {
-            audio: null,
-            currentButton: null,
-
-            show(audioElement, songData, button) {
-                const player = document.getElementById('global-player');
-                const playBtn = document.getElementById('player-play');
-                const playIcon = playBtn.querySelector('ion-icon');
-
-                // Update UI
-                document.getElementById('player-cover').src = songData.cover || '';
-                document.getElementById('player-title').textContent = songData.title;
-                document.getElementById('player-artist').textContent = songData.artist;
-
-                // Show player
-                player.classList.remove('hidden');
-
-                // Set current audio
-                if (this.audio && this.audio !== audioElement) {
-                    this.audio.pause();
-                    this.audio.currentTime = 0;
-                    if (this.currentButton) {
-                        const icon = this.currentButton.querySelector('ion-icon');
-                        if (icon) icon.setAttribute('name', 'play');
-                    }
-                }
-
-                this.audio = audioElement;
-                this.currentButton = button;
-
-                // Update play button
-                if (audioElement.paused) {
-                    playIcon.setAttribute('name', 'play');
-                } else {
-                    playIcon.setAttribute('name', 'pause');
-                }
-
-                // Bind events
-                this.bindEvents();
-            },
-
-            bindEvents() {
-                const playBtn = document.getElementById('player-play');
-                const seekBar = document.getElementById('player-seek');
-                const volumeBar = document.getElementById('player-volume');
-                const currentTime = document.getElementById('player-current');
-                const duration = document.getElementById('player-duration');
-                const progressMobile = document.getElementById('player-progress-mobile');
-
-                // Play/Pause
-                playBtn.onclick = () => {
-                    if (!this.audio) return;
-
-                    if (this.audio.paused) {
-                        this.audio.play();
-                        playBtn.querySelector('ion-icon').setAttribute('name', 'pause');
-                        if (this.currentButton) {
-                            const icon = this.currentButton.querySelector('ion-icon');
-                            if (icon) icon.setAttribute('name', 'pause');
-                        }
-                    } else {
-                        this.audio.pause();
-                        playBtn.querySelector('ion-icon').setAttribute('name', 'play');
-                        if (this.currentButton) {
-                            const icon = this.currentButton.querySelector('ion-icon');
-                            if (icon) icon.setAttribute('name', 'play');
-                        }
-                    }
-                };
-
-                // Update progress
-                if (!this.audio.dataset.globalBound) {
-                    this.audio.addEventListener('timeupdate', () => {
-                        if (!this.audio || !this.audio.duration) return;
-
-                        const percent = (this.audio.currentTime / this.audio.duration) * 100;
-                        if (seekBar) seekBar.value = percent;
-                        if (progressMobile) progressMobile.style.width = percent + '%';
-                        if (currentTime) currentTime.textContent = this.formatTime(this.audio.currentTime);
-                    });
-
-                    this.audio.addEventListener('loadedmetadata', () => {
-                        if (duration && this.audio.duration) {
-                            duration.textContent = this.formatTime(this.audio.duration);
-                        }
-                    });
-
-                    this.audio.addEventListener('ended', () => {
-                        playBtn.querySelector('ion-icon').setAttribute('name', 'play');
-                        if (this.currentButton) {
-                            const icon = this.currentButton.querySelector('ion-icon');
-                            if (icon) icon.setAttribute('name', 'play');
-                        }
-                    });
-
-                    this.audio.dataset.globalBound = '1';
-                }
-
-                // Seek
-                if (seekBar && !seekBar.dataset.bound) {
-                    seekBar.addEventListener('input', () => {
-                        if (!this.audio || !this.audio.duration) return;
-                        this.audio.currentTime = (seekBar.value / 100) * this.audio.duration;
-                    });
-                    seekBar.dataset.bound = '1';
-                }
-
-                // Volume
-                if (volumeBar && !volumeBar.dataset.bound) {
-                    volumeBar.addEventListener('input', () => {
-                        if (!this.audio) return;
-                        this.audio.volume = volumeBar.value / 100;
-                    });
-                    volumeBar.dataset.bound = '1';
-                }
-            },
-
-            formatTime(seconds) {
-                if (!seconds || !isFinite(seconds)) return '0:00';
-                const mins = Math.floor(seconds / 60);
-                const secs = Math.floor(seconds % 60);
-                return `${mins}:${secs.toString().padStart(2, '0')}`;
-            }
-        };
+        // Auth Modals
 
         // Auth Modals
         function openLoginModal() {
@@ -608,6 +443,18 @@
             }
         }
 
+        // Compact time helper: "4m", "2h", "3d", "1w", "2mo"
+        function timeAgo(dateStr) {
+            const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+            if (isNaN(diff) || diff < 5) return 'just now';
+            if (diff < 60) return diff + 's ago';
+            if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+            if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+            if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+            if (diff < 2592000) return Math.floor(diff / 604800) + 'w ago';
+            return Math.floor(diff / 2592000) + 'mo ago';
+        }
+
         // Global AJAX Comment Submit
         async function submitComment(type, id, listId) {
             const textarea = document.getElementById('comment-body-' + listId)
@@ -647,24 +494,22 @@
                 // Build comment HTML
                 const div = document.createElement('div');
                 div.id = `comment-${c.id}`;
-                div.className = 'overflow-hidden';
+                div.className = 'group relative flex items-start gap-2 transition duration-300';
                 div.innerHTML = `
-                    <div class="flex gap-2">
-                        <div class="w-10 h-10 bg-[#53a1b3]/10 flex items-center justify-center shrink-0 rounded-[3px]">
-                            <span class="text-[#53a1b3]/40 text-sm font-normal uppercase">${c.user_name.charAt(0)}</span>
+                    <div class="relative w-12 h-12 shrink-0 bg-[#1a2730]/40 rounded-[3px] overflow-hidden border border-white/5">
+                        <div class="w-full h-full flex items-center justify-center text-[#53a1b3]/30">
+                            <span class="text-sm font-normal uppercase">${c.user_name.charAt(0)}</span>
                         </div>
-                        <div class="flex-1 min-w-0 overflow-hidden">
-                            <div class="flex items-center justify-between mb-1">
-                                <span class="text-[#e96c4c] text-[11px] font-normal uppercase truncate">${c.user_name}</span>
-                                <div class="flex items-center gap-2 shrink-0 ml-2">
-                                    <span class="text-[#53a1b3]/30 text-[9px] uppercase">${c.created_at}</span>
-                                    <button onclick="deleteComment(${c.id}, this)" class="text-[#53a1b3]/30 hover:text-red-500 transition">
-                                        <ion-icon name="trash-outline" class="w-3.5 h-3.5"></ion-icon>
-                                    </button>
-                                </div>
-                            </div>
-                            <p class="text-white/90 text-[13px] leading-relaxed font-light break-all overflow-hidden">${c.body}</p>
-                        </div>
+                    </div>
+                    <div class="flex flex-col min-w-0 flex-1">
+                        <span class="text-white text-[13px] font-normal uppercase tracking-wide truncate group-hover:text-[#e96c4c] transition duration-300">${c.user_name}</span>
+                        <p class="text-[#53a1b3]/50 text-[10px] uppercase tracking-widest break-words mt-0.5">${c.body}</p>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 pt-0.5">
+                        <span class="text-[#53a1b3]/30 text-[9px] uppercase tracking-widest font-mono whitespace-nowrap">${timeAgo(c.created_at)}</span>
+                        <button onclick="deleteComment(${c.id}, this)" class="w-8 h-8 flex items-center justify-center text-[#53a1b3]/20 hover:text-red-500 transition rounded-[3px] hover:bg-red-500/5">
+                            <ion-icon name="trash-outline" class="w-4 h-4"></ion-icon>
+                        </button>
                     </div>
                 `;
 

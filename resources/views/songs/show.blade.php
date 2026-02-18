@@ -9,7 +9,7 @@
         <!-- Abstract Background Glow Removed -->
 
         <!-- Track Cover (Left - Responsive) -->
-        <div class="flex-shrink-0 w-24 h-24 md:w-[240px] md:h-[240px] relative shadow-lg md:shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-10">
+        <div class="flex-shrink-0 w-24 h-24 md:w-[240px] md:h-[240px] relative z-10">
             @if($song->cover_path)
                 <img src="{{ Storage::url($song->cover_path) }}" alt="{{ $song->title }}" class="w-full h-full object-cover">
             @else
@@ -143,7 +143,7 @@
     <div class="px-0 mt-6 mb-32">
 
         <div class="flex items-center gap-6 px-0">
-            <button onclick="switchTab('track')" id="btn-tab-track" class="pb-2 text-[13px] font-normal uppercase border-b-2 border-[#e96c4c] text-white transition-all">TRACK</button>
+            <button onclick="switchTab('track')" id="btn-tab-track" class="pb-2 text-[13px] font-normal uppercase border-b-2 border-[#e96c4c] text-white transition-all">COMMENTS</button>
             <button class="pb-2 text-[13px] font-normal uppercase border-b-2 border-transparent text-[#53a1b3]/20 hover:text-white transition-all cursor-not-allowed">LYRICS</button>
             <button onclick="switchTab('similar')" id="btn-tab-similar" class="pb-2 text-[13px] font-normal uppercase border-b-2 border-transparent text-[#53a1b3]/20 hover:text-white transition-all">SIMILAR TRACKS</button>
         </div>
@@ -166,7 +166,7 @@
                 </div>
 
                 <div id="content-similar" class="tab-content hidden animate-fade-in">
-                    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
+                    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 mt-2">
                         @foreach($relatedSongs as $relatedSong)
                         <a href="{{ route('songs.show', $relatedSong) }}" class="group">
                              <div class="aspect-square bg-[#1a2730] border border-[#53a1b3]/5 overflow-hidden relative shadow-lg">

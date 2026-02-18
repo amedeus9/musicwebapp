@@ -144,60 +144,26 @@
                             </div>
                         @else
                             @foreach($playlist->songs()->orderBy('position')->get() as $index => $song)
-                            <div class="flex items-center gap-3 p-2 hover:bg-[#1a2834] transition group rounded-[3px] border border-transparent hover:border-[#53a1b3]/5">
-                                <!-- (Position Removed) -->
-
-                                <!-- Cover -->
-                                <div class="w-10 h-10 bg-[#141e24] flex-shrink-0 overflow-hidden rounded-[3px] relative group-hover:shadow-lg transition">
-                                    @if($song->cover_path)
-                                        <img src="{{ Storage::url($song->cover_path) }}" alt="{{ $song->title }}" class="w-full h-full object-cover">
-                                    @else
-                                        <div class="w-full h-full flex items-center justify-center">
-                                            <ion-icon name="musical-notes-outline" class="w-5 h-5 text-[#53a1b3]/20"></ion-icon>
-                                        </div>
-                                    @endif
-                                    
-                                    <!-- Play Overlay -->
-                                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center cursor-pointer"
-                                         onclick="playSong('audio-{{ $song->id }}', '{{ $song->title }}', '{{ $song->artist }}', '{{ $song->cover_path ? Storage::url($song->cover_path) : '' }}', this)">
-                                        <ion-icon name="play" class="w-5 h-5 text-white"></ion-icon>
-                                    </div>
-                                </div>
-
-                                <!-- Info -->
-                                <div class="flex-1 min-w-0">
-                                    <a href="{{ route('songs.show', $song->slug) }}" class="text-white hover:text-[#e96c4c] text-sm font-normal truncate block transition">
-                                        {{ $song->title }}
-                                    </a>
-                                    <p class="text-[#53a1b3]/60 text-[10px] uppercase truncate">{{ $song->artist }}</p>
-                                </div>
-
-                                <!-- Audio Element for Inline Play -->
-                                <audio id="audio-{{ $song->id }}" src="{{ Storage::url($song->file_path) }}"></audio>
-
-                                <!-- Actions -->
-                                <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition">
-                                    <a href="{{ route('songs.show', $song->slug) }}" class="w-8 h-8 flex items-center justify-center text-[#53a1b3] hover:text-white transition">
-                                        <ion-icon name="eye-outline" class="w-4 h-4"></ion-icon>
-                                    </a>
-
+                                <x-song-item :song="$song" :index="$index">
                                     @auth
                                     @if(Auth::id() === $playlist->user_id || $playlist->collaborators->contains(Auth::id()))
-                                        <form id="remove-song-form-{{ $song->id }}" action="{{ route('playlists.removeSong', [$playlist->slug, $song->id]) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button"
-                                                data-confirm="Remove this song from the playlist?"
-                                                data-confirm-title="Remove Song"
-                                                data-confirm-form="remove-song-form-{{ $song->id }}"
-                                                class="w-8 h-8 flex items-center justify-center text-[#53a1b3] hover:text-red-500 transition">
-                                                <ion-icon name="close-outline" class="w-4 h-4"></ion-icon>
-                                            </button>
-                                        </form>
+                                        <x-slot name="actions">
+                                            <form id="remove-song-form-{{ $song->id }}" action="{{ route('playlists.removeSong', [$playlist->slug, $song->id]) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button"
+                                                    data-confirm="Remove this song from the playlist?"
+                                                    data-confirm-title="Remove Song"
+                                                    data-confirm-form="remove-song-form-{{ $song->id }}"
+                                                    class="w-full lg:w-8 h-[35px] lg:h-8 flex items-center justify-center gap-3 lg:gap-0 px-4 lg:px-0 bg-red-500/5 lg:bg-transparent text-red-500 transition rounded-[3px] hover:bg-red-500/10 border border-red-500/10 lg:border-none">
+                                                    <ion-icon name="trash-outline" class="w-4 h-4"></ion-icon>
+                                                    <span class="lg:hidden text-[10px] uppercase tracking-widest">Remove From Playlist</span>
+                                                </button>
+                                            </form>
+                                        </x-slot>
                                     @endif
                                     @endauth
-                                </div>
-                            </div>
+                                </x-song-item>
                             @endforeach
                         @endif
                     </div>
@@ -207,7 +173,6 @@
                 <!-- COMMENTS TAB -->
                 <div id="content-comments" class="tab-content hidden transition-all duration-300">
                     <!-- Review Input -->
-                    @auth
                     <x-comments
                         type="playlist"
                         :model-id="$playlist->id"
@@ -215,7 +180,6 @@
                         list-id="comments-list-playlist"
                         placeholder="Write a comment..."
                     />
-                    @endauth
                 </div>
 
                 <!-- COLLABORATORS TAB -->
@@ -394,52 +358,10 @@
         }
     }
 
-    // Global Player Integration for Inline Playlist Items
-    let currentAudio = null;
-    let currentButton = null;
-
-    function playSong(audioId, title, artist, cover, btnElement) {
-        const audio = document.getElementById(audioId);
-        if (!audio) return;
-
-        if (currentAudio && currentAudio !== audio) {
-            currentAudio.pause();
-            currentAudio.currentTime = 0;
-            // Reset previous button icon
-            if (currentButton) {
-                const icon = currentButton.querySelector('ion-icon');
-                if (icon) icon.setAttribute('name', 'play');
-            }
-        }
-
-        const icon = btnElement.querySelector('ion-icon');
-
-        if (audio.paused) {
-            audio.play();
-            if (icon) icon.setAttribute('name', 'pause');
-            currentAudio = audio;
-            currentButton = btnElement;
-
-            // Update Global Player
-            if (window.globalPlayer) {
-                window.globalPlayer.show(audio, { title, artist, cover }, btnElement);
-            }
-        } else {
-            audio.pause();
-            if (icon) icon.setAttribute('name', 'play');
-        }
-
-        audio.onended = () => {
-            if (icon) icon.setAttribute('name', 'play');
-        };
-    }
-
     function playFirstSong() {
-        // Find the first audio element in the list
-        const firstAudio = document.querySelector('audio[id^="audio-"]');
-        if (firstAudio) {
-            const btn = firstAudio.parentElement.querySelector('[onclick^="playSong"]');
-            if (btn) btn.click();
+        const firstPlayBtn = document.querySelector('[data-play-btn]');
+        if (firstPlayBtn) {
+            firstPlayBtn.click();
         }
     }
 </script>

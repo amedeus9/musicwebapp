@@ -13,7 +13,6 @@
     <div class="mt-2">
         <div class="flex gap-2">
             <textarea id="comment-body-{{ $listId }}" rows="1" maxlength="250"
-                oninput="updateCharCount('{{ $listId }}')"
                 class="flex-1 bg-[#1a2730]/40 border border-[#53a1b3]/10 text-white/80 text-[12px] p-2 focus:outline-none focus:border-[#e96c4c]/30 transition-all placeholder-[#53a1b3]/20 resize-none h-[35px] font-light leading-tight rounded-[3px]"
                 placeholder="{{ $placeholder }}"></textarea>
 
@@ -22,9 +21,7 @@
                 <ion-icon name="arrow-up" class="w-4 h-4"></ion-icon>
             </button>
         </div>
-        <div class="mt-1 text-right">
-            <span class="text-[9px] text-[#53a1b3]/30"><span id="char-count-{{ $listId }}">250</span></span>
-        </div>
+
     </div>
     @else
     <p class="text-[#53a1b3]/30 text-[10px] uppercase tracking-[0.2em]">
@@ -33,7 +30,7 @@
     @endauth
 
     {{-- Comments List --}}
-    <div id="{{ $listId }}" class="space-y-2 mt-2">
+    <div id="{{ $listId }}" class="flex flex-col gap-2 mt-2">
         @forelse($comments as $comment)
             <x-comment-item :comment="$comment" />
         @empty
