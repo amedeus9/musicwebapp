@@ -52,6 +52,15 @@ class PlaylistController extends Controller
             'cover_path' => $coverPath,
         ]);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'slug' => $playlist->slug,
+                'name' => $playlist->name,
+                'message' => 'Playlist created successfully!'
+            ]);
+        }
+
         return redirect()->route('playlists.show', $playlist->slug)
                         ->with('success', 'Playlist created successfully!');
     }
@@ -174,14 +183,21 @@ class PlaylistController extends Controller
         }
     }
 
-    public function removeSong(Playlist $playlist, Song $song)
+    public function removeSong(Request $request, Playlist $playlist, Song $song)
     {
         // Check ownership or collaboration
-        if (Auth::id() !== $playlist->user_id && !$playlist->collaborators->contains(Auth::id())) {
+        if (Auth::id() !== $playlist->user_id && !$playlist->collaborators->contains('id', Auth::id())) {
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+            }
             abort(403, 'Unauthorized action.');
         }
 
         $playlist->songs()->detach($song->id);
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Song removed from playlist!']);
+        }
 
         return back()->with('success', 'Song removed from playlist!');
     }

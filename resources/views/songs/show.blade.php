@@ -426,32 +426,102 @@
             document.body.style.overflow = 'auto';
         }
 
-        async function addToPlaylist(playlistSlug) {
+        async function togglePlaylist(playlistSlug, btn) {
             const songId = {{ $song->id }};
+            const isInPlaylist = btn.getAttribute('data-in-playlist') === 'true';
+            
+            const iconAdd   = btn.querySelector('.icon-add');
+            const iconCheck = btn.querySelector('.icon-check');
+            const iconRemove = btn.querySelector('.icon-remove');
 
-            try {
-                const response = await fetch(`/playlists/${playlistSlug}/songs`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({ song_id: songId })
-                });
+            if (isInPlaylist) {
+                // --- REMOVE ---
+                // Optimistic UI
+                setPlaylistState(btn, false);
 
-                const data = await response.json();
-                if(data.success) {
-                    alert('Song added to playlist!');
-                    closePlaylistModal();
-                } else {
-                    alert(data.message || 'Failed to add song to playlist');
+                try {
+                    const response = await fetch(`/playlists/${playlistSlug}/songs/${songId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    });
+                    const data = await response.json();
+                    if (!data.success) {
+                        setPlaylistState(btn, true); // Revert
+                        alert(data.message || 'Failed to remove song');
+                    }
+                } catch (e) {
+                    console.error(e);
+                    setPlaylistState(btn, true); // Revert
+                    alert('Failed to remove song');
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred');
+            } else {
+                // --- ADD ---
+                setPlaylistState(btn, true);
+
+                try {
+                    const response = await fetch(`/playlists/${playlistSlug}/songs`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({ song_id: songId })
+                    });
+                    const data = await response.json();
+                    if (!data.success) {
+                        setPlaylistState(btn, false); // Revert
+                        alert(data.message || 'Failed to add song');
+                    }
+                } catch (e) {
+                    console.error(e);
+                    setPlaylistState(btn, false); // Revert
+                    alert('Failed to add song');
+                }
             }
         }
+
+        function setPlaylistState(btn, inPlaylist) {
+            const iconAdd    = btn.querySelector('.icon-add');
+            const iconCheck  = btn.querySelector('.icon-check');
+            const iconRemove = btn.querySelector('.icon-remove');
+
+            btn.setAttribute('data-in-playlist', inPlaylist ? 'true' : 'false');
+
+            if (inPlaylist) {
+                iconAdd.style.display    = 'none';
+                iconCheck.style.display  = 'block';
+                iconRemove.style.display = 'none';
+
+                // Hover: show minus, hide check
+                btn.onmouseenter = () => {
+                    iconCheck.style.display  = 'none';
+                    iconRemove.style.display = 'block';
+                };
+                btn.onmouseleave = () => {
+                    iconCheck.style.display  = 'block';
+                    iconRemove.style.display = 'none';
+                };
+            } else {
+                iconAdd.style.display    = 'block';
+                iconCheck.style.display  = 'none';
+                iconRemove.style.display = 'none';
+                btn.onmouseenter = null;
+                btn.onmouseleave = null;
+            }
+        }
+
+        // Initialize states on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('#playlist-list-container button[data-in-playlist]').forEach(btn => {
+                const inPlaylist = btn.getAttribute('data-in-playlist') === 'true';
+                setPlaylistState(btn, inPlaylist);
+            });
+        });
 
         async function createNewPlaylistInline() {
             const nameInput = document.getElementById('inline-playlist-name');
@@ -477,8 +547,41 @@
                 const createData = await createResponse.json();
 
                 if (createResponse.ok && createData.slug) {
-                    // 2. Add current song to newly created playlist
-                    await addToPlaylist(createData.slug);
+                    // Update UI Dynamically
+                    const container = document.getElementById('playlist-list-container');
+                    const nomsg = document.getElementById('no-playlists-msg');
+                    if (nomsg) nomsg.classList.add('hidden');
+
+                    const btn = document.createElement('button');
+                    btn.setAttribute('onclick', `togglePlaylist('${createData.slug}', this)`);
+                    btn.setAttribute('data-in-playlist', 'false');
+                    btn.className = 'w-full h-[35px] flex items-center justify-between px-2 bg-[#1a2730]/40 border border-[#53a1b3]/20 hover:border-[#e96c4c] transition text-left group rounded-[3px]';
+                    btn.innerHTML = `
+                        <div class="flex items-center gap-3 overflow-hidden">
+                            <ion-icon name="list-outline" class="w-4 h-4 text-[#53a1b3] group-hover:text-[#e96c4c] shrink-0"></ion-icon>
+                            <span class="text-white text-xs font-normal truncate">${createData.name}</span>
+                        </div>
+                        <div class="relative w-4 h-4 flex items-center justify-center">
+                            <ion-icon name="add" class="w-5 h-5 text-[#53a1b3] group-hover:text-[#e96c4c] transition icon-add"></ion-icon>
+                            <ion-icon name="checkmark" class="w-5 h-5 text-green-500 transition hidden icon-check group-hover:opacity-0 absolute inset-0"></ion-icon>
+                            <ion-icon name="remove" class="w-5 h-5 text-red-500 transition hidden icon-remove group-hover:opacity-100 absolute inset-0"></ion-icon>
+                        </div>
+                    `;
+                    
+                    // Insert at top
+                    if (container.firstChild) {
+                        container.insertBefore(btn, container.firstChild);
+                    } else {
+                        container.appendChild(btn);
+                    }
+
+                    // Initialize icon state & hover events
+                    setPlaylistState(btn, false);
+                    
+                    // Clear input
+                    nameInput.value = '';
+                    container.scrollTop = 0;
+
                 } else {
                     alert(createData.message || 'Error creating playlist');
                 }
@@ -487,7 +590,7 @@
                 alert('An error occurred');
             } finally {
                 saveBtn.disabled = false;
-                saveBtn.innerText = 'Save';
+                saveBtn.innerText = 'Create';
             }
         }
     </script>
@@ -518,18 +621,38 @@
                 </div>
 
                 <!-- Playlist List -->
-                <div class="space-y-2 max-h-[200px] overflow-y-auto">
+                <div id="playlist-list-container" class="space-y-2 max-h-[200px] overflow-y-auto">
                     @php
                         $userPlaylists = auth()->user()->playlists->merge(auth()->user()->collaboratedPlaylists);
                     @endphp
 
                     @forelse($userPlaylists as $playlist)
-                    <button onclick="addToPlaylist('{{ $playlist->slug }}')" class="w-full h-[35px] flex items-center gap-3 px-2 bg-[#1a2730]/40 border border-[#53a1b3]/20 hover:border-[#e96c4c] hover:text-[#e96c4c] transition text-left group rounded-[3px]">
-                        <ion-icon name="list-outline" class="w-4 h-4 text-[#53a1b3] group-hover:text-[#e96c4c]"></ion-icon>
-                        <span class="text-white text-xs font-normal truncate">{{ $playlist->name }}</span>
+                    @php
+                        $isInPlaylist = $playlist->songs->contains($song->id);
+                    @endphp
+                    <button onclick="togglePlaylist('{{ $playlist->slug }}', this)" 
+                            data-in-playlist="{{ $isInPlaylist ? 'true' : 'false' }}"
+                            class="w-full h-[35px] flex items-center justify-between px-2 bg-[#1a2730]/40 border border-[#53a1b3]/20 hover:border-[#e96c4c] transition text-left group rounded-[3px]">
+                        
+                        <div class="flex items-center gap-3 overflow-hidden">
+                            <ion-icon name="list-outline" class="w-4 h-4 text-[#53a1b3] group-hover:text-[#e96c4c] shrink-0"></ion-icon>
+                            <span class="text-white text-xs font-normal truncate">{{ $playlist->name }}</span>
+                        </div>
+
+                        <!-- Status Icon -->
+                        <div class="relative w-4 h-4 flex items-center justify-center">
+                            <!-- Plus Icon (Default) -->
+                            <ion-icon name="add" class="w-5 h-5 text-[#53a1b3] group-hover:text-[#e96c4c] transition {{ $isInPlaylist ? 'hidden' : '' }} icon-add"></ion-icon>
+                            
+                            <!-- Tick Icon (In Playlist) -->
+                            <ion-icon name="checkmark" class="w-5 h-5 text-green-500 transition {{ $isInPlaylist ? '' : 'hidden' }} icon-check group-hover:opacity-0 absolute inset-0"></ion-icon>
+                            
+                            <!-- Minus Icon (Hover on In Playlist) -->
+                            <ion-icon name="remove" class="w-5 h-5 text-red-500 transition hidden icon-remove group-hover:opacity-100 absolute inset-0 {{ $isInPlaylist ? 'group-hover:block' : '' }}"></ion-icon>
+                        </div>
                     </button>
                     @empty
-                    <p class="text-[#53a1b3]/50 text-xs text-center py-2">No playlists found</p>
+                    <p id="no-playlists-msg" class="text-[#53a1b3]/50 text-xs text-center py-2">No playlists found</p>
                     @endforelse
                 </div>
             </div>
