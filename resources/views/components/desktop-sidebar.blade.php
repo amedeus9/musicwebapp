@@ -30,10 +30,12 @@
             <span class="text-xs font-normal uppercase tracking-wider">Albums</span>
         </a>
 
+        @auth
         <a href="{{ route('songs.create') }}" class="flex items-center gap-3 px-4 py-2 group transition rounded-[3px] {{ request()->routeIs('songs.create') ? 'bg-[#e96c4c] text-white shadow-lg shadow-[#e96c4c]/20' : 'text-[#53a1b3] hover:bg-[#53a1b3]/10 hover:text-white' }}">
             <ion-icon name="cloud-upload-outline" class="w-4 h-4"></ion-icon>
             <span class="text-xs font-normal uppercase tracking-wider">Upload</span>
         </a>
+        @endauth
 
         <a href="{{ route('favorites') }}" class="flex items-center gap-3 px-4 py-2 group transition rounded-[3px] {{ request()->routeIs('favorites') ? 'bg-[#e96c4c] text-white shadow-lg shadow-[#e96c4c]/20' : 'text-[#53a1b3] hover:bg-[#53a1b3]/10 hover:text-white' }}">
             <ion-icon name="heart-outline" class="w-4 h-4"></ion-icon>
@@ -46,37 +48,12 @@
         </a>
 
         @auth
-        <a href="{{ route('profile') }}" class="flex items-center gap-3 px-4 py-2 group transition rounded-[3px] {{ request()->routeIs('profile*') ? 'bg-[#e96c4c] text-white shadow-lg shadow-[#e96c4c]/20' : 'text-[#53a1b3] hover:bg-[#53a1b3]/10 hover:text-white' }}">
-            <ion-icon name="person-outline" class="w-4 h-4"></ion-icon>
-            <span class="text-xs font-normal uppercase tracking-wider">Profile</span>
-        </a>
-
         @if(auth()->user()->isAdmin())
         <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-2 group transition rounded-[3px] {{ request()->routeIs('admin.*') ? 'bg-[#e96c4c] text-white shadow-lg shadow-[#e96c4c]/20' : 'text-[#53a1b3] hover:bg-[#53a1b3]/10 hover:text-white' }}">
             <ion-icon name="shield-checkmark-outline" class="w-4 h-4"></ion-icon>
             <span class="text-xs font-normal uppercase tracking-wider">Admin Panel</span>
         </a>
         @endif
-
-        <a href="{{ route('logout') }}"
-           onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-           class="flex items-center gap-3 px-4 py-2 text-[#53a1b3] hover:bg-red-500/10 hover:text-red-400 transition rounded-[3px]">
-            <ion-icon name="log-out-outline" class="w-4 h-4"></ion-icon>
-            <span class="text-xs font-normal uppercase tracking-wider">Sign Out</span>
-        </a>
-        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
-            @csrf
-        </form>
-        @else
-        <a href="{{ route('login') }}" class="flex items-center gap-3 px-4 py-2 group transition rounded-[3px] {{ request()->routeIs('login') ? 'bg-[#e96c4c] text-white shadow-lg shadow-[#e96c4c]/20' : 'text-[#53a1b3] hover:bg-[#53a1b3]/10 hover:text-white' }}">
-            <ion-icon name="log-in-outline" class="w-4 h-4"></ion-icon>
-            <span class="text-xs font-normal uppercase tracking-wider">Sign In</span>
-        </a>
-
-        <a href="{{ route('register') }}" class="flex items-center gap-3 px-4 py-2 group transition rounded-[3px] {{ request()->routeIs('register') ? 'bg-[#e96c4c] text-white shadow-lg shadow-[#e96c4c]/20' : 'text-[#53a1b3] hover:bg-[#53a1b3]/10 hover:text-white' }}">
-            <ion-icon name="person-add-outline" class="w-4 h-4"></ion-icon>
-            <span class="text-xs font-normal uppercase tracking-wider">Register</span>
-        </a>
         @endauth
     </nav>
 

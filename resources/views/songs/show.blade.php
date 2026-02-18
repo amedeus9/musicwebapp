@@ -494,44 +494,49 @@
 
     <!-- Playlist Modal -->
     @auth
-    <div id="playlist-modal" class="hidden fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4" onclick="if(event.target === this) closePlaylistModal()">
-        <div class="bg-[#1a2730] w-[300px] shadow-2xl overflow-hidden border border-[#53a1b3]/10 rounded-[3px]">
-            <!-- Header -->
-            <div class="p-2 pb-0">
-                <h3 class="text-white text-[13px] font-normal uppercase tracking-wider">Playlist</h3>
-                <div class="h-0.5 w-10 bg-[#e96c4c] mt-1.5"></div>
-            </div>
+    <!-- Playlist Modal -->
+    <div id="playlist-modal" onclick="if(event.target === this) closePlaylistModal()" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-start justify-center pt-64 p-4 backdrop-blur-sm transition-opacity">
+        <div onclick="event.stopPropagation()" class="w-[350px] bg-[#1a2730] shadow-2xl rounded-[3px] overflow-hidden border border-[#53a1b3]/10 flex flex-col">
             
-            <div class="border-t border-[#53a1b3]/10 mt-2"></div>
-
-            <!-- Create Inline -->
-            <div class="p-2 flex items-center gap-2">
-                <input type="text" id="inline-playlist-name" placeholder="CREATE NEW PLAYLIST" 
-                    class="flex-1 bg-[#141e24] border border-[#53a1b3]/10 text-white text-xs p-2 focus:ring-1 focus:ring-[#e96c4c]/30 focus:outline-none placeholder-[#53a1b3]/20 uppercase tracking-tighter rounded-[3px]">
-                <button onclick="createNewPlaylistInline()" class="bg-[#e96c4c] px-4 py-2 text-xs text-white hover:bg-[#e96c4c]/90 transition flex-shrink-0 uppercase font-medium rounded-[3px]">
-                    Save
-                </button>
+            <!-- Header -->
+            <div class="px-2 pt-2 border-b border-[#53a1b3]/10 mb-2">
+                <div class="inline-block relative pb-2 text-sm font-medium text-white uppercase tracking-wider">
+                    Add to Playlist
+                    <div class="absolute bottom-[-1px] left-0 w-full h-[2px] bg-[#e96c4c]"></div>
+                </div>
             </div>
 
-            <!-- Playlist List -->
-            <div class="px-2 pb-2 flex flex-col gap-1.5 max-h-[200px] overflow-y-auto">
-                @php
-                    $userPlaylists = auth()->user()->playlists->merge(auth()->user()->collaboratedPlaylists);
-                @endphp
+            <!-- Content -->
+            <div class="p-2 space-y-2 flex-1">
+                <!-- Create Inline -->
+                <div class="flex items-center gap-2 mb-4">
+                    <input type="text" id="inline-playlist-name" placeholder="New Playlist Name" 
+                        class="flex-1 h-[35px] bg-[#1a2730]/40 border border-[#53a1b3]/20 text-white text-xs px-2 rounded-[3px] focus:outline-none focus:border-[#e96c4c] placeholder-[#53a1b3]/50 transition">
+                    <button onclick="createNewPlaylistInline()" class="h-[35px] px-4 bg-[#e96c4c] text-white rounded-[3px] text-xs font-medium uppercase tracking-wider hover:bg-[#d45a3a] transition shadow-lg shadow-[#e96c4c]/20">
+                        Create
+                    </button>
+                </div>
 
-                @foreach($userPlaylists as $playlist)
-                <button onclick="addToPlaylist('{{ $playlist->slug }}')" class="w-full flex items-center gap-2.5 px-4 py-2 bg-[#141e24] border border-[#53a1b3]/5 hover:border-[#e96c4c]/30 transition text-left group rounded-[3px]">
-                    <ion-icon name="add-outline" class="w-4 h-4 text-[#53a1b3]/40 group-hover:text-[#e96c4c]"></ion-icon>
-                    <span class="text-white/80 text-xs uppercase tracking-wide truncate">{{ $playlist->name }}</span>
-                </button>
-                @endforeach
+                <!-- Playlist List -->
+                <div class="space-y-2 max-h-[200px] overflow-y-auto">
+                    @php
+                        $userPlaylists = auth()->user()->playlists->merge(auth()->user()->collaboratedPlaylists);
+                    @endphp
+
+                    @forelse($userPlaylists as $playlist)
+                    <button onclick="addToPlaylist('{{ $playlist->slug }}')" class="w-full h-[35px] flex items-center gap-3 px-2 bg-[#1a2730]/40 border border-[#53a1b3]/20 hover:border-[#e96c4c] hover:text-[#e96c4c] transition text-left group rounded-[3px]">
+                        <ion-icon name="list-outline" class="w-4 h-4 text-[#53a1b3] group-hover:text-[#e96c4c]"></ion-icon>
+                        <span class="text-white text-xs font-normal truncate">{{ $playlist->name }}</span>
+                    </button>
+                    @empty
+                    <p class="text-[#53a1b3]/50 text-xs text-center py-2">No playlists found</p>
+                    @endforelse
+                </div>
             </div>
-
-            <div class="border-t border-[#53a1b3]/10 mt-1"></div>
 
             <!-- Footer -->
-            <div class="p-2 flex justify-end">
-                <button onclick="closePlaylistModal()" class="border border-[#53a1b3]/20 text-[#53a1b3] hover:text-white px-4 py-2 text-xs uppercase tracking-widest transition rounded-[3px]">
+            <div class="p-2 border-t border-[#53a1b3]/10 flex justify-end mt-2">
+                <button onclick="closePlaylistModal()" class="px-4 py-2 border border-[#e96c4c] text-[#e96c4c] hover:bg-[#e96c4c] hover:text-white text-xs font-medium uppercase tracking-wider rounded-[3px] transition shadow-lg shadow-[#e96c4c]/5">
                     Close
                 </button>
             </div>

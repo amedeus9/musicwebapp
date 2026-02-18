@@ -173,22 +173,7 @@
             </form>
         </div>
         
-        <!-- Danger Zone -->
-        <div class="mt-8 max-w-3xl border border-red-500/20 bg-red-500/5 p-4 rounded-[3px]">
-             <h4 class="text-red-500 text-[12px] uppercase tracking-wider font-normal mb-2 flex items-center gap-2">
-                <ion-icon name="warning-outline"></ion-icon> Danger Zone
-             </h4>
-             <div class="flex items-center justify-between">
-                 <p class="text-[#53a1b3]/60 text-[11px]">Once you delete a playlist, there is no going back. Please be certain.</p>
-                 <form action="{{ route('playlists.destroy', $playlist->slug) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this playlist? This action cannot be undone.');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="text-red-500 hover:text-white border border-red-500/30 hover:bg-red-500 px-4 py-2 text-xs font-normal uppercase tracking-wider rounded-[3px] transition">
-                        Delete Playlist
-                    </button>
-                </form>
-             </div>
-        </div>
+
     </div>
 
 </div>

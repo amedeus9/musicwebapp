@@ -9,7 +9,22 @@
 
     <title>{{ config('app.name', 'MusicApp') }}</title>
 
-    @if(env('APP_ENV') === 'production')
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/icons/icon-192.png') }}">
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+
+    @if(app()->environment('production'))
         @php
             $manifest = json_decode(file_get_contents(public_path('build/manifest.json')), true);
         @endphp
@@ -116,16 +131,127 @@
                     </a>
                     @endif
                 @else
-                <a href="{{ route('login') }}" class="flex flex-col items-center gap-1 p-2 group {{ request()->routeIs('login') ? 'text-[#e96c4c]' : 'text-[#53a1b3] opacity-60 hover:opacity-100' }}">
+                <button onclick="openLoginModal()" class="flex flex-col items-center gap-1 p-2 group {{ request()->routeIs('login') ? 'text-[#e96c4c]' : 'text-[#53a1b3] opacity-60 hover:opacity-100' }}">
                     <div class="w-6 h-6 flex items-center justify-center transition group-active:scale-90">
                         <ion-icon name="log-in-outline" class="w-4 h-4"></ion-icon>
                     </div>
                     <span class="text-[8px] font-normal uppercase tracking-tighter">Login</span>
-                </a>
+                </button>
                 @endauth
 
             </nav>
         </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" onclick="closeAuthModal(event)" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-start justify-center pt-64 p-4 backdrop-blur-sm transition-opacity">
+        <div onclick="event.stopPropagation()" class="w-[350px] bg-[#1a2730] shadow-2xl rounded-[3px] overflow-hidden border border-[#53a1b3]/10 flex flex-col">
+            
+            <!-- Header (Tabs) -->
+            <div class="px-2 pt-2 border-b border-[#53a1b3]/10">
+                <div class="flex gap-4">
+                    <!-- Login Tab -->
+                    <button onclick="switchAuthTab('login')" class="relative pb-2 text-sm font-medium text-white transition-colors focus:outline-none uppercase tracking-wider">
+                        Login
+                        <div id="tab-indicator-login" class="absolute bottom-[-1px] left-0 w-full h-[2px] bg-[#e96c4c]"></div>
+                    </button>
+                    <!-- Register Tab -->
+                    <button onclick="switchAuthTab('register')" class="relative pb-2 text-sm font-medium text-[#53a1b3] hover:text-white transition-colors focus:outline-none uppercase tracking-wider">
+                        Register
+                        <div id="tab-indicator-register" class="hidden absolute bottom-[-1px] left-0 w-full h-[2px] bg-[#e96c4c]"></div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Login View -->
+            <div id="auth-content-login" class="flex flex-1 flex-col">
+                <form method="POST" action="{{ route('login') }}" class="flex-1 flex flex-col">
+                    @csrf
+                    <!-- Content -->
+                    <div class="p-2 space-y-2 flex-1">
+                        <!-- Email -->
+                        <div class="space-y-1">
+                            <input id="login-email" type="email" name="email" required autocomplete="email" autofocus
+                                   class="w-full h-[35px] bg-[#1a2730]/40 border border-[#53a1b3]/20 text-white text-xs px-2 rounded-[3px] focus:outline-none focus:border-[#e96c4c] placeholder-[#53a1b3]/50 transition"
+                                   placeholder="Username or email">
+                        </div>
+
+                        <!-- Password -->
+                        <div class="space-y-1">
+                            <input id="login-password" type="password" name="password" required autocomplete="current-password"
+                                   class="w-full h-[35px] bg-[#1a2730]/40 border border-[#53a1b3]/20 text-white text-xs px-2 rounded-[3px] focus:outline-none focus:border-[#e96c4c] placeholder-[#53a1b3]/50 transition"
+                                   placeholder="Password">
+                        </div>
+
+                        <!-- Options -->
+                        <div class="flex items-center justify-between text-xs pt-1">
+                            <label class="flex items-center gap-2 cursor-pointer text-[#53a1b3] hover:text-white transition">
+                                <input class="w-3.5 h-3.5 rounded-[2px] bg-[#1a2730] border-[#53a1b3]/20 text-[#e96c4c] focus:ring-0 focus:ring-offset-0" type="checkbox" name="remember" id="remember">
+                                <span>Remember me</span>
+                            </label>
+                            
+                            <a href="{{ route('password.request') }}" class="text-[#53a1b3] hover:text-[#e96c4c] transition">Forgot your password?</a>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="p-2 border-t border-[#53a1b3]/10 flex justify-end">
+                        <button type="submit" class="px-4 py-2 border border-[#e96c4c] text-[#e96c4c] hover:bg-[#e96c4c] hover:text-white text-xs font-medium uppercase tracking-wider rounded-[3px] transition shadow-lg shadow-[#e96c4c]/5">
+                            Login
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Register View -->
+            <div id="auth-content-register" class="hidden flex-1 flex-col">
+                <form method="POST" action="{{ route('register') }}" class="flex-1 flex flex-col">
+                    @csrf
+                    <!-- Content -->
+                    <div class="p-2 space-y-2 flex-1">
+                        <!-- Name -->
+                        <div class="space-y-1">
+                            <input id="register-name" type="text" name="name" required autocomplete="name"
+                                   class="w-full h-[35px] bg-[#1a2730]/40 border border-[#53a1b3]/20 text-white text-xs px-2 rounded-[3px] focus:outline-none focus:border-[#e96c4c] placeholder-[#53a1b3]/50 transition"
+                                   placeholder="Full Name">
+                        </div>
+
+                        <!-- Email -->
+                        <div class="space-y-1">
+                            <input id="register-email" type="email" name="email" required autocomplete="email"
+                                   class="w-full h-[35px] bg-[#1a2730]/40 border border-[#53a1b3]/20 text-white text-xs px-2 rounded-[3px] focus:outline-none focus:border-[#e96c4c] placeholder-[#53a1b3]/50 transition"
+                                   placeholder="Email Address">
+                        </div>
+
+                        <!-- Password -->
+                        <div class="space-y-1">
+                            <input id="register-password" type="password" name="password" required autocomplete="new-password"
+                                   class="w-full h-[35px] bg-[#1a2730]/40 border border-[#53a1b3]/20 text-white text-xs px-2 rounded-[3px] focus:outline-none focus:border-[#e96c4c] placeholder-[#53a1b3]/50 transition"
+                                   placeholder="Password">
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="space-y-1">
+                            <input id="register-password-confirm" type="password" name="password_confirmation" required autocomplete="new-password"
+                                   class="w-full h-[35px] bg-[#1a2730]/40 border border-[#53a1b3]/20 text-white text-xs px-2 rounded-[3px] focus:outline-none focus:border-[#e96c4c] placeholder-[#53a1b3]/50 transition"
+                                   placeholder="Confirm Password">
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="p-2 border-t border-[#53a1b3]/10 flex justify-end">
+                        <button type="submit" class="px-4 py-2 border border-[#e96c4c] text-[#e96c4c] hover:bg-[#e96c4c] hover:text-white text-xs font-medium uppercase tracking-wider rounded-[3px] transition shadow-lg shadow-[#e96c4c]/5">
+                            Register
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Click outside to close (Optional invisible overlay logic handled by JS or just the button inside?) -->
+        <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-white/50 hover:text-white transition md:hidden">
+            <ion-icon name="close-circle-outline" class="w-8 h-8"></ion-icon>
+        </button>
     </div>
 
     <!-- Global Player Bar -->
@@ -362,6 +488,53 @@
                 return `${mins}:${secs.toString().padStart(2, '0')}`;
             }
         };
+
+        // Auth Modals
+        function openLoginModal() {
+            document.getElementById('auth-modal').classList.remove('hidden');
+            switchAuthTab('login');
+        }
+
+        function openRegisterModal() {
+            document.getElementById('auth-modal').classList.remove('hidden');
+            switchAuthTab('register');
+        }
+
+        function closeAuthModal(event) {
+            if (event && event.target.id !== 'auth-modal' && !event.target.closest('button')) return;
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+
+        function switchAuthTab(tab) {
+            const loginContent = document.getElementById('auth-content-login');
+            const registerContent = document.getElementById('auth-content-register');
+            const loginIndicator = document.getElementById('tab-indicator-login');
+            const registerIndicator = document.getElementById('tab-indicator-register');
+
+            if (tab === 'login') {
+                loginContent.classList.remove('hidden');
+                registerContent.classList.add('hidden');
+                
+                loginIndicator.classList.remove('hidden');
+                registerIndicator.classList.add('hidden');
+                
+                loginIndicator.parentElement.classList.add('text-white');
+                loginIndicator.parentElement.classList.remove('text-[#53a1b3]');
+                registerIndicator.parentElement.classList.add('text-[#53a1b3]');
+                registerIndicator.parentElement.classList.remove('text-white');
+            } else {
+                loginContent.classList.add('hidden');
+                registerContent.classList.remove('hidden');
+                
+                loginIndicator.classList.add('hidden');
+                registerIndicator.classList.remove('hidden');
+                
+                registerIndicator.parentElement.classList.add('text-white');
+                registerIndicator.parentElement.classList.remove('text-[#53a1b3]');
+                loginIndicator.parentElement.classList.add('text-[#53a1b3]');
+                loginIndicator.parentElement.classList.remove('text-white');
+            }
+        }
     </script>
     <!-- Ionicons -->
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>

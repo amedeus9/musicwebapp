@@ -34,9 +34,9 @@
                 <ion-icon name="person-outline" class="w-4 h-4"></ion-icon>
             </a>
             @else
-            <a href="{{ route('login') }}" class="w-10 h-10 bg-[#0f1319] hover:bg-[#1a2730] border border-[#53a1b3]/20 flex items-center justify-center text-[#53a1b3] transition-colors rounded-[3px]">
+            <button onclick="openLoginModal()" class="w-10 h-10 bg-[#0f1319] hover:bg-[#1a2730] border border-[#53a1b3]/20 flex items-center justify-center text-[#53a1b3] transition-colors rounded-[3px]">
                 <ion-icon name="log-in-outline" class="w-4 h-4"></ion-icon>
-            </a>
+            </button>
             @endauth
         </div>
     @endif

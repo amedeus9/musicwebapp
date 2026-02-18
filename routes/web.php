@@ -17,8 +17,8 @@ Route::get('/artists/{artist:slug}', [ArtistController::class, 'show'])->name('a
 
 // Song Routes
 Route::get('/songs', [SongController::class, 'index'])->name('songs.index');
-Route::get('/songs/create', [SongController::class, 'create'])->name('songs.create');
-Route::post('/songs', [SongController::class, 'store'])->name('songs.store');
+Route::get('/songs/create', [SongController::class, 'create'])->name('songs.create')->middleware('auth');
+Route::post('/songs', [SongController::class, 'store'])->name('songs.store')->middleware('auth');
 Route::get('/songs/{song:slug}', [SongController::class, 'show'])->name('songs.show');
 Route::delete('/songs/{song:slug}', [SongController::class, 'destroy'])->name('songs.destroy')->middleware('auth');
 Route::get('/songs/{song:slug}/download', [SongController::class, 'download'])->name('songs.download');
@@ -53,14 +53,14 @@ Route::delete('/playlists/{playlist:slug}/collaborators/{user}', [PlaylistContro
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [LoginController::class, 'login']);
-    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-    Route::post('/register', [RegisterController::class, 'register']);
-});
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/register', [RegisterController::class, 'register']);
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
+// Redirect GET login/register to home since we use modals
+Route::get('/login', function () { return redirect('/'); })->name('login');
+Route::get('/register', function () { return redirect('/'); })->name('register');
+Route::get('/password/reset', function() { return redirect('/'); })->name('password.request');
 
 // Admin Routes
 use App\Http\Controllers\Admin\AdminController;

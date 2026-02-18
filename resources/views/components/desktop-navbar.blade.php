@@ -20,10 +20,12 @@
     <div class="flex items-center gap-4">
 
         <!-- Upload Button (Mini) -->
+        @auth
         <a href="{{ route('songs.create') }}" class="hidden lg:flex items-center gap-2 px-4 py-2 bg-[#e96c4c]/10 text-[#e96c4c] rounded-[3px] text-xs font-normal uppercase tracking-wider hover:bg-[#e96c4c] hover:text-white transition">
             <ion-icon name="cloud-upload-outline" class="w-4 h-4"></ion-icon>
             <span>Upload</span>
         </a>
+        @endauth
 
         <div class="h-6 w-px bg-[#53a1b3]/20 mx-2"></div>
 
@@ -34,15 +36,31 @@
                 <p class="text-white text-xs font-normal leading-none">{{ auth()->user()->name }}</p>
                 <p class="text-[#e96c4c] text-[10px] uppercase tracking-wider">Premium Member</p>
             </div>
+            <div class="relative group">
+                <a href="{{ route('profile') }}" class="w-10 h-10 rounded-[3px] bg-gradient-to-br from-[#141e24] to-[#0f1319] border border-[#53a1b3]/20 flex items-center justify-center text-[#53a1b3] hover:text-[#e96c4c] transition">
+                    <ion-icon name="person-outline" class="w-5 h-5"></ion-icon>
+                </a>
+                
+                <!-- Dropdown -->
+                <div class="absolute right-0 top-full mt-2 w-48 bg-[#1a2730] border border-[#53a1b3]/10 rounded-[3px] shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <a href="{{ route('profile') }}" class="flex items-center gap-2 px-4 py-3 text-xs text-[#53a1b3] hover:text-white hover:bg-[#141e24] transition border-b border-[#53a1b3]/5 first:rounded-t-[3px]">
+                        <ion-icon name="person-outline" class="w-4 h-4"></ion-icon>
+                        <span>My Profile</span>
+                    </a>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center gap-2 px-4 py-3 text-xs text-[#e96c4c] hover:bg-[#141e24] transition last:rounded-b-[3px] text-left">
+                            <ion-icon name="log-out-outline" class="w-4 h-4"></ion-icon>
+                            <span>Logout</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
             @else
-            <div class="text-right hidden lg:block">
-                <p class="text-white text-xs font-normal leading-none">Guest User</p>
-                <p class="text-[#53a1b3] text-[10px] uppercase tracking-wider">Free Plan</p>
-            </div>
+            <button onclick="openLoginModal()" class="px-6 py-2 bg-[#e96c4c] text-white rounded-[3px] text-xs font-medium uppercase tracking-wider hover:bg-[#d45a3a] transition shadow-lg shadow-[#e96c4c]/20">
+                Login
+            </button>
             @endauth
-            <div class="w-10 h-10 rounded-[3px] bg-gradient-to-br from-[#141e24] to-[#0f1319] border border-[#53a1b3]/20 flex items-center justify-center text-[#53a1b3]">
-                <ion-icon name="person-outline" class="w-5 h-5"></ion-icon>
-            </div>
         </div>
     </div>
 </header>
