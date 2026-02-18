@@ -225,8 +225,18 @@ protected function isAccessible(User $user, ?string $path = null): bool
 </laravel-boost-guidelines>
 
 
+
 ## Mandatory
 @section('content')
 <div class="flex-1 flex flex-col overflow-y-auto pb-24 gap-1">
-    
 
+## Recent Changes
+- **Collaborative Playlists**: Added `playlist_user` pivot table, updated models, controllers, and views to support inviting and removing collaborators.
+- **UI Redesign**: 
+    - Redesigned "Collaborators" tab in playlist view to match premium aesthetic (transparent, square avatars).
+    - Redesigned Playlist Edit page to remove card wrappers, use transparent backgrounds, custom file inputs, and toggle switches for privacy.
+- **Global Rules**:
+    - **Buttons**: All buttons must have `Rounded-[3px]`, `px-4 py-2`, `text-xs`, and `w-4 h-4` icons.
+    - **Inputs**: Inputs should generally use `h-[35px]` and transparent/glassy backgrounds (`bg-[#1a2730]/40`).
+    - **Avatars**: User avatars should be square `rounded-[3px]`.
+    - **Empty States**: Remove borders and backgrounds from empty state containers.

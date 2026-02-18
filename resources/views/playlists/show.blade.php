@@ -264,7 +264,6 @@
                     
                     <!-- Invite Section -->
                     <div class="mb-6">
-                        <label class="text-[10px] text-[#53a1b3]/50 uppercase tracking-widest mb-2 block">Invite Collaborator</label>
                         <form action="{{ route('playlists.invite', $playlist->slug) }}" method="POST" class="relative">
                             @csrf
                             <div class="flex gap-2">
@@ -306,7 +305,7 @@
                                 </div>
                             </div>
                             @empty
-                            <div class="py-12 text-center border border-[#53a1b3]/5 rounded-[3px] bg-[#1a2730]/20 border-dashed">
+                            <div class="py-12 text-center">
                                 <div class="w-12 h-12 bg-[#53a1b3]/5 rounded-full flex items-center justify-center mx-auto mb-3">
                                     <ion-icon name="people-outline" class="w-6 h-6 text-[#53a1b3]/20"></ion-icon>
                                 </div>
