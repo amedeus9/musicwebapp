@@ -3,8 +3,8 @@
 @section('content')
 <div class="flex flex-col gap-0">
 
-    <!-- Song List (Condensed) -->
-    <div id="songs-container" class="flex flex-col gap-2 min-h-[50vh]">
+    <!-- Song List (Grid) -->
+    <div id="songs-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-2 min-h-[50vh]">
         @if($songs->count() > 0)
             @include('songs.partials.list')
         @else

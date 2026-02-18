@@ -53,7 +53,7 @@ class SongController extends Controller
             'title' => 'required',
             'artist' => 'required',
             'country_id' => 'required|exists:countries,id',
-            'file' => 'required|file|mimes:mp3,wav,ogg|max:20480', // 20MB max
+            'file' => 'required|file|mimetypes:audio/mpeg,audio/mp3,audio/wav,audio/wave,audio/x-wav,audio/ogg,audio/x-ogg|max:20480',
             'cover' => 'nullable|image|max:2048',
         ]);
 
@@ -74,7 +74,7 @@ class SongController extends Controller
             'cover_path' => $coverPath,
         ]);
 
-        return redirect()->route('home')->with('success', 'Song uploaded successfully!');
+        return redirect()->route('songs.index')->with('success', 'Song uploaded successfully!');
     }
 
     public function show(\App\Models\Song $song)

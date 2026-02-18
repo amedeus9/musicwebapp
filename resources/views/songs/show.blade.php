@@ -4,12 +4,12 @@
 <div class="flex-1 flex flex-col overflow-y-auto pb-24 h-screen scroll-smooth">
 
     <!-- Header Section (Jamendo Layout) -->
-    <div class="w-full flex flex-row gap-4 px-0 py-0 relative overflow-hidden group">
+    <div class="w-full flex flex-row gap-2 px-0 py-0 relative overflow-hidden group">
         <!-- Abstract Background Glow -->
         <!-- Abstract Background Glow Removed -->
 
         <!-- Track Cover (Left - Responsive) -->
-        <div class="flex-shrink-0 w-24 h-24 md:w-[240px] md:h-[240px] relative z-10">
+        <div class="flex-shrink-0 w-36 h-36 md:w-[240px] md:h-[240px] relative z-10 rounded-[3px] overflow-hidden">
             @if($song->cover_path)
                 <img src="{{ Storage::url($song->cover_path) }}" alt="{{ $song->title }}" class="w-full h-full object-cover">
             @else
@@ -168,24 +168,7 @@
                 <div id="content-similar" class="tab-content hidden animate-fade-in">
                     <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 mt-2">
                         @foreach($relatedSongs as $relatedSong)
-                        <a href="{{ route('songs.show', $relatedSong) }}" class="group">
-                             <div class="aspect-square bg-[#1a2730] border border-[#53a1b3]/5 overflow-hidden relative shadow-lg">
-                                 @if($relatedSong->cover_path)
-                                     <img src="{{ Storage::url($relatedSong->cover_path) }}" alt="{{ $relatedSong->title }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
-                                 @else
-                                     <div class="w-full h-full flex items-center justify-center text-[#53a1b3]/10">
-                                         <ion-icon name="musical-notes" class="w-12 h-12"></ion-icon>
-                                     </div>
-                                 @endif
-                                 <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                                     <div class="w-12 h-12 bg-[#e96c4c] rounded-full flex items-center justify-center text-white scale-0 group-hover:scale-100 transition delay-75 shadow-lg">
-                                         <ion-icon name="play" class="w-6 h-6 ml-0.5"></ion-icon>
-                                     </div>
-                                 </div>
-                             </div>
-                             <h4 class="text-white text-xs font-normal uppercase line-clamp-1 group-hover:text-[#e96c4c] transition">{{ $relatedSong->title }}</h4>
-                             <p class="text-[#53a1b3]/40 text-[10px] uppercase line-clamp-1 font-light">{{ $relatedSong->artist }}</p>
-                        </a>
+                            <x-song-card :song="$relatedSong" />
                         @endforeach
                     </div>
                 </div>

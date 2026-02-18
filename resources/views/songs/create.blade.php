@@ -18,6 +18,18 @@
     <div class="max-w-2xl">
         <form action="{{ route('songs.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
+
+            {{-- Validation Errors --}}
+            @if($errors->any())
+                <div class="bg-red-500/10 border border-red-500/20 rounded-[3px] p-3">
+                    <p class="text-red-400 text-[10px] uppercase tracking-widest mb-1">Please fix the following errors:</p>
+                    <ul class="space-y-0.5">
+                        @foreach($errors->all() as $error)
+                            <li class="text-red-400/80 text-[11px]">• {{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Title -->
@@ -107,7 +119,7 @@
                             onchange="document.getElementById('audio-filename').innerText = this.files[0].name"
                         >
                     </label>
-                    <p class="text-[9px] text-[#53a1b3]/20 uppercase tracking-tighter">Max 10MB • Recommended high bitrate</p>
+                    <p class="text-[9px] text-[#53a1b3]/20 uppercase tracking-tighter">Max 20MB • MP3, WAV, OGG supported</p>
                 </div>
 
                 <!-- Cover Image -->

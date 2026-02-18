@@ -1,3 +1,3 @@
-@foreach($songs as $index => $song)
-    <x-song-item :song="$song" :index="$index" :songs="$songs" />
+@foreach($songs as $song)
+    <x-song-card :song="$song" />
 @endforeach
