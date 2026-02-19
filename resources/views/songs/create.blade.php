@@ -50,45 +50,30 @@
                 <div class="space-y-1.5">
                     <label class="text-[10px] text-[#53a1b3]/50 uppercase tracking-widest block">Artist Name</label>
                     <div class="relative">
-                        <input 
-                            type="text" 
-                            name="artist" 
-                            class="w-full h-[35px] bg-[#1a2730]/40 border border-[#53a1b3]/10 text-white text-xs px-2 rounded-[3px] focus:outline-none focus:border-[#e96c4c]/30 transition placeholder-[#53a1b3]/20"
-                            placeholder="Enter artist name..."
-                            required
-                        >
-                    </div>
-                </div>
-            </div>
-
-            <!-- Country & Category (If applicable) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="space-y-1.5">
-                    <label class="text-[10px] text-[#53a1b3]/50 uppercase tracking-widest block">Country</label>
-                    <div class="relative">
                         <select 
-                            name="country_id" 
+                            name="artist_id" 
                             class="w-full h-[35px] bg-[#1a2730]/40 border border-[#53a1b3]/10 text-white text-xs px-2 rounded-[3px] focus:outline-none focus:border-[#e96c4c]/30 transition appearance-none"
                             required
                         >
-                            <option value="" disabled selected class="bg-[#1a2730]">Select Country</option>
-                            @foreach($countries as $country)
-                                <option value="{{ $country->id }}" class="bg-[#1a2730]">{{ $country->name }}</option>
-                            @endforeach
+                            <option value="" disabled selected class="bg-[#1a2730]">Select Artist</option>
+                            @if(isset($artists))
+                                @foreach($artists as $artist)
+                                    <option value="{{ $artist->id }}" class="bg-[#1a2730]">{{ $artist->name }}</option>
+                                @endforeach
+                            @endif
                         </select>
                         <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-[#53a1b3]/40">
                             <ion-icon name="chevron-down-outline" class="w-3 h-3"></ion-icon>
                         </div>
                     </div>
-                </div>
-
-                <div class="space-y-1.5 flex flex-col justify-end">
-                    <p class="text-[10px] text-[#53a1b3]/30 uppercase tracking-widest flex items-center gap-1.5">
-                        <ion-icon name="information-circle-outline" class="w-3 h-3"></ion-icon>
-                        Pick the origin of the sound
-                    </p>
+                    @if(!isset($artists) || $artists->isEmpty())
+                        <p class="text-[9px] text-[#e96c4c]/80 mt-1">No artists found. Please create an artist first.</p>
+                    @endif
                 </div>
             </div>
+
+            <!-- Country & Category (If applicable) -->
+
 
             <!-- Description -->
             <div class="space-y-1.5">

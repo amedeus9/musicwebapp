@@ -1,5 +1,12 @@
 @props(['song'])
 
+@php
+    $artistProfile = $song->artistProfile;
+    $countrySlug = $artistProfile?->country->slug ?? 'global';
+    $artistSlug = $artistProfile?->slug ?? \Illuminate\Support\Str::slug($song->artist);
+    $songUrl = route('songs.show', ['country' => $countrySlug, 'artist' => $artistSlug, 'song' => $song->slug]);
+@endphp
+
 <div class="group relative flex flex-col gap-1">
     {{-- Cover --}}
     <div class="aspect-square bg-[#1a2730] border border-[#53a1b3]/5 overflow-hidden relative rounded-[3px]">
@@ -21,12 +28,12 @@
         </div>
         
         {{-- Global Click Link (Cover click navigates) --}}
-        <a href="{{ route('songs.show', $song->slug) }}" class="absolute inset-0 z-10 bg-black/0 group-hover:bg-black/20 transition duration-300"></a>
+        <a href="{{ $songUrl }}" class="absolute inset-0 z-10 bg-black/0 group-hover:bg-black/20 transition duration-300"></a>
     </div>
 
     {{-- Info --}}
     <div class="min-w-0">
-        <a href="{{ route('songs.show', $song->slug) }}" class="song-title block text-white text-[11px] uppercase font-normal truncate group-hover:text-[#e96c4c] transition">{{ $song->title }}</a>
+        <a href="{{ $songUrl }}" class="song-title block text-white text-[11px] uppercase font-normal truncate group-hover:text-[#e96c4c] transition">{{ $song->title }}</a>
         <p class="song-artist text-[#53a1b3]/40 text-[10px] uppercase truncate">{{ $song->artist }}</p>
     </div>
 

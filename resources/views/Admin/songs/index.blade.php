@@ -12,8 +12,14 @@
             <p class="text-[#53a1b3] text-sm">Total: {{ $songs->total() }} songs</p>
         </div>
 
-        <!-- Search Form -->
-        <form method="GET" action="{{ route('admin.songs.index') }}" class="flex gap-2 w-full md:w-auto">
+        <div class="flex flex-col md:flex-row gap-3">
+             <a href="{{ route('admin.songs.create') }}" class="bg-[#e96c4c] hover:bg-[#e96c4c]/90 text-white px-4 py-2 text-sm uppercase tracking-wider transition flex items-center gap-2 h-full">
+                <ion-icon name="add-circle-outline" class="w-5 h-5"></ion-icon>
+                <span class="whitespace-nowrap">Add New</span>
+            </a>
+
+            <!-- Search Form -->
+            <form method="GET" action="{{ route('admin.songs.index') }}" class="flex gap-2 w-full md:w-auto">
             <input
                 type="text"
                 name="search"
@@ -43,13 +49,19 @@
                         <th class="px-4 py-3 text-left text-xs font-normal text-[#53a1b3] uppercase tracking-wider">Title</th>
                         <th class="px-4 py-3 text-left text-xs font-normal text-[#53a1b3] uppercase tracking-wider">Artist</th>
                         <th class="px-4 py-3 text-left text-xs font-normal text-[#53a1b3] uppercase tracking-wider">Album</th>
-                        <th class="px-4 py-3 text-left text-xs font-normal text-[#53a1b3] uppercase tracking-wider">Uploader</th>
+
                         <th class="px-4 py-3 text-left text-xs font-normal text-[#53a1b3] uppercase tracking-wider">Date</th>
                         <th class="px-4 py-3 text-right text-xs font-normal text-[#53a1b3] uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#53a1b3]/10">
                     @forelse($songs as $song)
+                    @php
+                        $artistProfile = $song->artistProfile;
+                        $countrySlug = $artistProfile?->country->slug ?? 'global';
+                        $artistSlug = $artistProfile?->slug ?? \Illuminate\Support\Str::slug($song->artist);
+                        $songUrl = route('songs.show', ['country' => $countrySlug, 'artist' => $artistSlug, 'song' => $song->slug]);
+                    @endphp
                     <tr class="hover:bg-[#1a2834] transition">
                         <td class="px-4 py-3">
                             @if($song->cover_path)
@@ -69,15 +81,13 @@
                         <td class="px-4 py-3">
                             <p class="text-[#53a1b3] text-sm">{{ $song->album ?? '-' }}</p>
                         </td>
-                        <td class="px-4 py-3">
-                            <p class="text-[#53a1b3] text-sm">{{ $song->user?->name ?? 'Unknown' }}</p>
-                        </td>
+
                         <td class="px-4 py-3">
                             <p class="text-[#53a1b3] text-xs">{{ $song->created_at->format('M d, Y') }}</p>
                         </td>
                         <td class="px-4 py-3">
                             <div class="flex items-center justify-end gap-2">
-                                <a href="{{ route('songs.show', $song->slug) }}" target="_blank" class="text-[#53a1b3] hover:text-white transition" title="View">
+                                <a href="{{ $songUrl }}" target="_blank" class="text-[#53a1b3] hover:text-white transition" title="View">
                                     <ion-icon name="eye-outline" class="w-5 h-5"></ion-icon>
                                 </a>
                                 <a href="{{ route('admin.songs.edit', $song->id) }}" class="text-[#53a1b3] hover:text-[#e96c4c] transition" title="Edit">
@@ -111,26 +121,32 @@
         <!-- Mobile Cards -->
         <div class="md:hidden divide-y divide-[#53a1b3]/10">
             @forelse($songs as $song)
-            <div class="p-4">
-                <div class="flex items-start gap-3 mb-3">
-                    @if($song->cover_path)
-                        <img src="{{ Storage::url($song->cover_path) }}" alt="{{ $song->title }}" class="w-16 h-16 object-cover flex-shrink-0">
-                    @else
-                        <div class="w-16 h-16 bg-[#141e24] flex items-center justify-center flex-shrink-0">
-                            <ion-icon name="musical-notes-outline" class="w-6 h-6 text-[#53a1b3]"></ion-icon>
+                    @php
+                        $artistProfile = $song->artistProfile;
+                        $countrySlug = $artistProfile?->country->slug ?? 'global';
+                        $artistSlug = $artistProfile?->slug ?? \Illuminate\Support\Str::slug($song->artist);
+                        $songUrl = route('songs.show', ['country' => $countrySlug, 'artist' => $artistSlug, 'song' => $song->slug]);
+                    @endphp
+                    <div class="p-4">
+                        <div class="flex items-start gap-3 mb-3">
+                            @if($song->cover_path)
+                                <img src="{{ Storage::url($song->cover_path) }}" alt="{{ $song->title }}" class="w-16 h-16 object-cover flex-shrink-0">
+                            @else
+                                <div class="w-16 h-16 bg-[#141e24] flex items-center justify-center flex-shrink-0">
+                                    <ion-icon name="musical-notes-outline" class="w-6 h-6 text-[#53a1b3]"></ion-icon>
+                                </div>
+                            @endif
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-white text-sm font-normal mb-1">{{ $song->title }}</h3>
+                                <p class="text-[#53a1b3] text-xs">{{ $song->artist }}</p>
+        
+                                <p class="text-[#53a1b3] text-xs">{{ $song->created_at->format('M d, Y') }}</p>
+                            </div>
                         </div>
-                    @endif
-                    <div class="flex-1 min-w-0">
-                        <h3 class="text-white text-sm font-normal mb-1">{{ $song->title }}</h3>
-                        <p class="text-[#53a1b3] text-xs">{{ $song->artist }}</p>
-                        <p class="text-[#53a1b3] text-xs">By: {{ $song->user?->name ?? 'Unknown' }}</p>
-                        <p class="text-[#53a1b3] text-xs">{{ $song->created_at->format('M d, Y') }}</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <a href="{{ route('songs.show', $song->slug) }}" target="_blank" class="flex-1 bg-[#141e24] hover:bg-[#1a2834] text-[#53a1b3] px-3 py-2 text-xs uppercase tracking-wider text-center transition">
-                        View
-                    </a>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ $songUrl }}" target="_blank" class="flex-1 bg-[#141e24] hover:bg-[#1a2834] text-[#53a1b3] px-3 py-2 text-xs uppercase tracking-wider text-center transition">
+                                View
+                            </a>
                     <a href="{{ route('admin.songs.edit', $song->id) }}" class="flex-1 bg-[#e96c4c] hover:bg-[#e96c4c]/90 text-white px-3 py-2 text-xs uppercase tracking-wider text-center transition">
                         Edit
                     </a>

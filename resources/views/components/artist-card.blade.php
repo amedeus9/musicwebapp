@@ -1,6 +1,6 @@
 @props(['artist'])
 
-<a href="{{ route('artists.show', $artist->slug) }}" class="group relative flex flex-col gap-2 cursor-pointer">
+<a href="{{ route('artists.show', ['country' => $artist->country->slug ?? 'global', 'artist' => $artist]) }}" class="group relative flex flex-col gap-2 cursor-pointer">
     {{-- Avatar / Image --}}
     <div class="aspect-square bg-[#1a2730] border border-[#53a1b3]/5 overflow-hidden relative rounded-[3px]">
         @if($artist->image_path)

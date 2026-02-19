@@ -8,10 +8,10 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $latestReleases = \App\Models\Song::latest()->limit(5)->get();
-        $songs = \App\Models\Song::latest()->get();
+        $latestReleases = \App\Models\Song::with(['artistProfile.country', 'albumRelation'])->latest()->limit(5)->get();
+        $songs = \App\Models\Song::with(['artistProfile.country', 'albumRelation'])->latest()->get();
         $albums = \App\Models\Album::latest()->take(5)->get();
-        $artists = \App\Models\Artist::take(10)->get(); // Increased limit for 2-row layout
+        $artists = \App\Models\Artist::with('country')->take(10)->get(); // Increased limit for 2-row layout
 
         // Get top public playlists with most songs
         $topPlaylists = \App\Models\Playlist::where('is_public', true)

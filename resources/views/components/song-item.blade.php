@@ -7,6 +7,13 @@
     'showStats' => true
 ])
 
+@php
+    $artistProfile = $song->artistProfile;
+    $countrySlug = $artistProfile?->country->slug ?? 'global';
+    $artistSlug = $artistProfile?->slug ?? \Illuminate\Support\Str::slug($song->artist);
+    $songUrl = route('songs.show', ['country' => $countrySlug, 'artist' => $artistSlug, 'song' => $song->slug]);
+@endphp
+
 <div class="group relative flex items-center lg:grid lg:grid-cols-[1fr_20%_15%_200px] gap-4 transition duration-300">
     
     <!-- Track Info -->
@@ -31,7 +38,7 @@
         </div>
 
         <div class="flex flex-col min-w-0">
-            <a href="{{ route('songs.show', $song) }}" class="song-title text-white text-[13px] lg:text-sm font-normal uppercase tracking-wide truncate group-hover:text-[#e96c4c] transition duration-300">
+            <a href="{{ $songUrl }}" class="song-title text-white text-[13px] lg:text-sm font-normal uppercase tracking-wide truncate group-hover:text-[#e96c4c] transition duration-300">
                 {{ $song->title }}
             </a>
             <div class="flex items-center gap-2 mt-0.5">
@@ -49,10 +56,12 @@
     <!-- Album (Desktop) -->
     <div class="hidden lg:flex items-center min-w-0">
         @if($showAlbum)
-            @if($song->album)
-                <a href="{{ route('albums.show', $song->album) }}" class="text-[#53a1b3]/50 text-[10px] uppercase tracking-widest truncate hover:text-white transition">
-                    {{ $song->album->title }}
+            @if($song->album_id && $song->albumRelation)
+                <a href="{{ route('albums.show', $song->albumRelation) }}" class="text-[#53a1b3]/50 text-[10px] uppercase tracking-widest truncate hover:text-white transition">
+                    {{ $song->albumRelation->title }}
                 </a>
+            @elseif($song->album && is_string($song->album))
+                 <span class="text-[#53a1b3]/50 text-[10px] uppercase tracking-widest truncate">{{ $song->album }}</span>
             @else
                 <span class="text-[#53a1b3]/20 text-[10px] uppercase tracking-widest">— Single</span>
             @endif
@@ -64,7 +73,7 @@
         @if($showDuration)
             <span class="text-[#53a1b3]/50 text-[10px] uppercase font-mono tracking-widest flex items-center gap-1.5">
                 <ion-icon name="time-outline" class="w-2.5 h-2.5"></ion-icon>
-                {{ floor($song->duration / 60) }}:{{ str_pad($song->duration % 60, 2, '0', STR_PAD_LEFT) }}
+                {{ floor((int)$song->duration / 60) }}:{{ str_pad((int)$song->duration % 60, 2, '0', STR_PAD_LEFT) }}
             </span>
         @endif
     </div>
@@ -89,7 +98,7 @@
             </button>
             
             <!-- Share Button -->
-            <button onclick="shareSong('{{ addslashes($song->title) }}', '{{ addslashes($song->artist) }}', '{{ route('songs.show', $song) }}')" 
+            <button onclick="shareSong('{{ addslashes($song->title) }}', '{{ addslashes($song->artist) }}', '{{ $songUrl }}')" 
                     class="w-8 h-8 flex items-center justify-center text-[#53a1b3]/40 hover:text-white transition rounded-[3px] hover:bg-white/5">
                 <ion-icon name="share-social-outline" class="w-4 h-4"></ion-icon>
             </button>
@@ -128,11 +137,11 @@
             <div class="grid grid-cols-2 gap-y-5 gap-x-4">
                 <div class="flex flex-col gap-1.5">
                     <span class="text-[9px] text-[#53a1b3]/40 uppercase tracking-[0.2em]">Album</span>
-                    <span class="text-white text-[10px] uppercase tracking-widest truncate">{{ $song->album->title ?? 'Single' }}</span>
+                    <span class="text-white text-[10px] uppercase tracking-widest truncate">{{ $song->albumRelation?->title ?? $song->album ?? 'Single' }}</span>
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <span class="text-[9px] text-[#53a1b3]/40 uppercase tracking-[0.2em]">Duration</span>
-                    <span class="text-white text-[10px] font-mono tracking-widest">{{ floor($song->duration / 60) }}:{{ str_pad($song->duration % 60, 2, '0', STR_PAD_LEFT) }}</span>
+                    <span class="text-white text-[10px] font-mono tracking-widest">{{ floor((int)$song->duration / 60) }}:{{ str_pad((int)$song->duration % 60, 2, '0', STR_PAD_LEFT) }}</span>
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <span class="text-[9px] text-[#53a1b3]/40 uppercase tracking-[0.2em]">Release Date</span>
@@ -153,12 +162,12 @@
                     </div>
                 @endif
                 
-                <a href="{{ route('songs.show', $song) }}" 
+                <a href="{{ $songUrl }}" 
                     class="flex items-center gap-3 px-4 py-2 bg-white/5 text-white text-xs uppercase tracking-widest hover:bg-white/10 transition rounded-[3px]">
                     <ion-icon name="arrow-forward-outline" class="w-4 h-4 text-[#e96c4c]"></ion-icon>
                     Go to Track
                 </a>
-                <button onclick="closeBottomSheet(); shareSong('{{ addslashes($song->title) }}', '{{ addslashes($song->artist) }}', '{{ route('songs.show', $song) }}')" 
+                <button onclick="closeBottomSheet(); shareSong('{{ addslashes($song->title) }}', '{{ addslashes($song->artist) }}', '{{ $songUrl }}')" 
                         class="flex items-center gap-3 px-4 py-2 bg-white/5 text-white text-xs uppercase tracking-widest hover:bg-white/10 transition rounded-[3px]">
                     <ion-icon name="share-social-outline" class="w-4 h-4 text-[#53a1b3]"></ion-icon>
                     Share Track

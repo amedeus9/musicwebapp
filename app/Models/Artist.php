@@ -11,6 +11,7 @@ class Artist extends Model
         'slug',
         'bio',
         'image_path',
+        'country_id',
     ];
 
     public function albums()
@@ -21,6 +22,11 @@ class Artist extends Model
     public function songs()
     {
         return $this->hasMany(Song::class);
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
     }
 
     public function getRouteKeyName(): string

@@ -18,12 +18,17 @@ class ArtistController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(\App\Models\Artist $artist)
+    public function show(\App\Models\Country $country, \App\Models\Artist $artist)
     {
+        // Validate relationship
+        if ($artist->country_id && $artist->country_id != $country->id) {
+            abort(404, 'Artist not found in this country');
+        }
+
         $artist->load(['albums', 'songs' => function($query) {
-            $query->latest()->take(10);
+            $query->with(['artistProfile.country', 'albumRelation'])->latest()->take(10);
         }]);
         
-        return view('artists.show', compact('artist'));
+        return view('artists.show', compact('artist', 'country'));
     }
 }

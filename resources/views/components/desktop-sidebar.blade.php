@@ -36,10 +36,12 @@
         </a>
 
         @auth
+        @if(auth()->user()->isAdmin())
         <a href="{{ route('songs.create') }}" class="flex items-center gap-3 px-4 py-2 group transition rounded-[3px] {{ request()->routeIs('songs.create') ? 'bg-[#e96c4c] text-white shadow-lg shadow-[#e96c4c]/20' : 'text-[#53a1b3] hover:bg-[#53a1b3]/10 hover:text-white' }}">
             <ion-icon name="cloud-upload-outline" class="w-4 h-4"></ion-icon>
             <span class="text-xs font-normal uppercase tracking-wider">Upload</span>
         </a>
+        @endif
         @endauth
 
         <a href="{{ route('favorites') }}" class="flex items-center gap-3 px-4 py-2 group transition rounded-[3px] {{ request()->routeIs('favorites') ? 'bg-[#e96c4c] text-white shadow-lg shadow-[#e96c4c]/20' : 'text-[#53a1b3] hover:bg-[#53a1b3]/10 hover:text-white' }}">

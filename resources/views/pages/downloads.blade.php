@@ -10,7 +10,13 @@
             @if($hasFavorites)
                 <div class="space-y-1">
                     @foreach($songs as $song)
-                    <a href="{{ route('songs.show', $song->slug) }}" class="flex items-center gap-3 group transition hover:bg-[#0f1319] border border-transparent hover:border-[#53a1b3]/10">
+                    @php
+                        $artistProfile = $song->artistProfile;
+                        $countrySlug = $artistProfile?->country->slug ?? 'global';
+                        $artistSlug = $artistProfile?->slug ?? \Illuminate\Support\Str::slug($song->artist);
+                        $songUrl = route('songs.show', ['country' => $countrySlug, 'artist' => $artistSlug, 'song' => $song->slug]);
+                    @endphp
+                    <a href="{{ $songUrl }}" class="flex items-center gap-3 group transition hover:bg-[#0f1319] border border-transparent hover:border-[#53a1b3]/10">
 
                         @if($song->cover_path)
                             <div class="relative w-12 h-12 shrink-0 group">

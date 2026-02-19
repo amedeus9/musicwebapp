@@ -14,13 +14,13 @@ Route::get('/albums/{album:slug}', [AlbumController::class, 'show'])->name('albu
 
 // Artist Routes
 Route::get('/artists', [ArtistController::class, 'index'])->name('artists.index');
-Route::get('/artists/{artist:slug}', [ArtistController::class, 'show'])->name('artists.show');
+// Artist Show Route Moved to Bottom for dynamic URL handling
 
 // Song Routes
 Route::get('/songs', [SongController::class, 'index'])->name('songs.index');
 Route::get('/songs/create', [SongController::class, 'create'])->name('songs.create')->middleware('auth');
 Route::post('/songs', [SongController::class, 'store'])->name('songs.store')->middleware('auth');
-Route::get('/songs/{song:slug}', [SongController::class, 'show'])->name('songs.show');
+// Route::get('/songs/{song:slug}', [SongController::class, 'show'])->name('songs.show'); // Moved to dynamic route
 Route::delete('/songs/{song:slug}', [SongController::class, 'destroy'])->name('songs.destroy')->middleware('auth');
 Route::get('/songs/{song:slug}/download', [SongController::class, 'download'])->name('songs.download');
 
@@ -73,6 +73,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
     // Songs Management
     Route::get('/songs', [AdminSongController::class, 'index'])->name('songs.index');
+    Route::get('/songs/create', [AdminSongController::class, 'create'])->name('songs.create');
+    Route::post('/songs', [AdminSongController::class, 'store'])->name('songs.store');
     Route::get('/songs/{song}/edit', [AdminSongController::class, 'edit'])->name('songs.edit');
     Route::put('/songs/{song}', [AdminSongController::class, 'update'])->name('songs.update');
     Route::delete('/songs/{song}', [AdminSongController::class, 'destroy'])->name('songs.destroy');
@@ -81,12 +83,20 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 
+    // Artist Management
+    Route::resource('artists', \App\Http\Controllers\Admin\ArtistController::class);
+
     // Placeholder routes - to be implemented
     Route::get('/albums', function () { return redirect()->route('admin.dashboard'); })->name('albums.index');
-    Route::get('/artists', function () { return redirect()->route('admin.dashboard'); })->name('artists.index');
     Route::get('/playlists', function () { return redirect()->route('admin.dashboard'); })->name('playlists.index');
     Route::get('/comments', function () { return redirect()->route('admin.dashboard'); })->name('comments.index');
     // Settings Management
     Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings');
     Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 });
+
+// Dynamic Artist Route (Must be last - 2 params)
+Route::get('/{country:slug}/{artist:slug}', [ArtistController::class, 'show'])->name('artists.show');
+
+// Dynamic Song Route (Must be last - 3 params)
+Route::get('/{country:slug}/{artist:slug}/{song:slug}', [SongController::class, 'show'])->name('songs.show');

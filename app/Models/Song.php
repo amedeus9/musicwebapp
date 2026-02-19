@@ -6,17 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Song extends Model
 {
+
     protected $fillable = [
-        'user_id',
+        // 'user_id', // Removed
         'title',
         'slug',
-        'artist',
+        // 'artist', // Removed
         'description',
         'file_path',
         'cover_path',
         'downloads',
-        'country_id',
-        'album',
+        // 'country_id', // Removed
+        // 'album', // Removed
         'artist_id',
         'album_id',
         'genre',
@@ -28,6 +29,17 @@ class Song extends Model
         'lyrics',
     ];
 
+    public function getArtistAttribute()
+    {
+        return $this->artistProfile?->name ?? 'Unknown Artist';
+    }
+
+    public function getAlbumAttribute()
+    {
+        return $this->albumRelation?->title;
+    }
+
+    /*
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -37,15 +49,16 @@ class Song extends Model
     {
         return $this->belongsTo(Country::class);
     }
+    */
 
     public function artistProfile()
     {
         return $this->belongsTo(Artist::class, 'artist_id');
     }
 
-    public function album()
+    public function albumRelation()
     {
-        return $this->belongsTo(Album::class);
+        return $this->belongsTo(Album::class, 'album_id');
     }
 
     public function likes()

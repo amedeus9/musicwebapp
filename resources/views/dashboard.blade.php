@@ -9,7 +9,13 @@
         <div id="latest-releases-scroll" class="flex overflow-x-auto gap-2 pb-2 scrollbar-hide scroll-smooth">
             @foreach($latestReleases as $song)
             <div class="flex-shrink-0 w-[150px] group">
-                <a href="{{ route('songs.show', $song) }}" class="block relative mb-2">
+                @php
+                    $artistProfile = $song->artistProfile;
+                    $countrySlug = $artistProfile?->country->slug ?? 'global';
+                    $artistSlug = $artistProfile?->slug ?? \Illuminate\Support\Str::slug($song->artist);
+                    $songUrl = route('songs.show', ['country' => $countrySlug, 'artist' => $artistSlug, 'song' => $song->slug]);
+                @endphp
+                <a href="{{ $songUrl }}" class="block relative mb-2">
                     <div class="w-[150px] h-[150px] border border-[#53a1b3]/20 group-hover:border-[#e96c4c]/50 transition overflow-hidden">
                         <x-cover-art :path="$song->cover_path" :alt="$song->title" :hover="true" fallback-icon="musical-notes-outline" />
                     </div>
@@ -70,7 +76,7 @@
         <x-section-header title="Popular Artists" :view-all="'#'" />
         <div class="grid grid-cols-4 md:grid-cols-6 gap-2 px-1">
             @foreach($artists as $artist)
-            <a href="{{ route('artists.show', $artist) }}" class="group block text-center">
+            <a href="{{ route('artists.show', ['country' => $artist->country->slug ?? 'global', 'artist' => $artist]) }}" class="group block text-center">
                 <div class="aspect-square bg-[#0f1319] border border-[#53a1b3]/20 mb-2 relative overflow-hidden w-full">
                     <x-cover-art :path="$artist->image_path" :alt="$artist->name" :hover="true" fallback-icon="mic-outline" />
                 </div>
@@ -111,7 +117,13 @@
             <div id="trending-songs-scroll" class="flex overflow-x-auto gap-2 pb-2 scrollbar-hide scroll-smooth">
                 @foreach($songs->sortByDesc('downloads')->take(5) as $song)
                 <div class="flex-shrink-0 w-[120px] group">
-                    <a href="{{ route('songs.show', $song) }}" class="block relative mb-2">
+                    @php
+                        $artistProfile = $song->artistProfile;
+                        $countrySlug = $artistProfile?->country->slug ?? 'global';
+                        $artistSlug = $artistProfile?->slug ?? \Illuminate\Support\Str::slug($song->artist);
+                        $songUrl = route('songs.show', ['country' => $countrySlug, 'artist' => $artistSlug, 'song' => $song->slug]);
+                    @endphp
+                    <a href="{{ $songUrl }}" class="block relative mb-2">
                         <div class="w-[120px] h-[120px] border border-[#53a1b3]/20 group-hover:border-[#e96c4c]/50 transition overflow-hidden">
                             <x-cover-art :path="$song->cover_path" :alt="$song->title" fallback-icon="cloud-upload-outline" icon-color="text-orange-500" />
                         </div>
@@ -129,7 +141,13 @@
             <x-section-header title="Top Downloads This Week" />
             <div class="flex flex-col">
                 @foreach($songs->sortByDesc('downloads')->take(5) as $song)
-                <a href="{{ route('songs.show', $song) }}" class="flex items-center gap-3 py-1 group transition">
+                @php
+                    $artistProfile = $song->artistProfile;
+                    $countrySlug = $artistProfile?->country->slug ?? 'global';
+                    $artistSlug = $artistProfile?->slug ?? \Illuminate\Support\Str::slug($song->artist);
+                    $songUrl = route('songs.show', ['country' => $countrySlug, 'artist' => $artistSlug, 'song' => $song->slug]);
+                @endphp
+                <a href="{{ $songUrl }}" class="flex items-center gap-3 py-1 group transition">
                     <div class="w-12 h-12 shrink-0 ml-1 overflow-hidden">
                         <x-cover-art :path="$song->cover_path" :alt="$song->title" size="w-12 h-12" fallback-icon="musical-notes-outline" icon-size="w-5 h-5" bg="bg-[#213042]" />
                     </div>
@@ -164,7 +182,13 @@
             <x-section-header title="Track List" :view-all="route('songs.index')" />
             <div class="flex flex-col">
                 @foreach($songs->sortByDesc('downloads')->take(5) as $song)
-                <a href="{{ route('songs.show', $song) }}" class="flex items-center gap-3 py-1 group transition">
+                @php
+                    $artistProfile = $song->artistProfile;
+                    $countrySlug = $artistProfile?->country->slug ?? 'global';
+                    $artistSlug = $artistProfile?->slug ?? \Illuminate\Support\Str::slug($song->artist);
+                    $songUrl = route('songs.show', ['country' => $countrySlug, 'artist' => $artistSlug, 'song' => $song->slug]);
+                @endphp
+                <a href="{{ $songUrl }}" class="flex items-center gap-3 py-1 group transition">
                     <div class="w-12 h-12 shrink-0 ml-1 overflow-hidden">
                         <x-cover-art :path="$song->cover_path" :alt="$song->title" size="w-12 h-12" fallback-icon="musical-notes-outline" icon-size="w-5 h-5" bg="bg-[#213042]" />
                     </div>

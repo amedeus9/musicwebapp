@@ -20,19 +20,21 @@ class SongController extends Controller
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'like', '%'.$searchTerm.'%')
-                    ->orWhere('artist', 'like', '%'.$searchTerm.'%')
-                    // Simple genre simulation if no actual genre column exists yet,
-                    // or check description. But if musicapp has genre logic (it didn't seem to have a genre column, just simulating), we keep it simple.
+                    ->orWhereHas('artistProfile', function($query) use ($searchTerm) {
+                        $query->where('name', 'like', '%'.$searchTerm.'%');
+                    })
                     ->orWhere('description', 'like', '%'.$searchTerm.'%');
             });
         }
 
         // Handle country filter if passed
         if ($request->has('country_id') && $request->country_id != '') {
-            $query->where('country_id', $request->country_id);
+            $query->whereHas('artistProfile', function($q) use ($request) {
+                $q->where('country_id', $request->country_id);
+            });
         }
 
-        $songs = $query->with(['country', 'artistProfile', 'album'])->latest()->paginate(20);
+        $songs = $query->with(['artistProfile.country', 'albumRelation'])->latest()->paginate(20);
 
         if ($request->ajax()) {
             return view('songs.partials.list', compact('songs'));
@@ -43,34 +45,36 @@ class SongController extends Controller
 
     public function create()
     {
-        $countries = \App\Models\Country::orderBy('name')->get();
-        return view('songs.create', compact('countries'));
+        if (!Auth::check() || !Auth::user()->is_admin) {       
+            abort(403, 'Only admins can upload tracks.');
+        }
+
+        $artists = \App\Models\Artist::orderBy('name')->get();
+        return view('songs.create', compact('artists'));
     }
 
     public function store(Request $request, \App\Services\AudioMetadataService $metaService)
     {
+        if (!Auth::check() || !Auth::user()->is_admin) {
+            abort(403);
+        }
+
         $request->validate([
             'title' => 'required',
-            'artist' => 'required',
-            'country_id' => 'required|exists:countries,id',
+            'artist_id' => 'required|exists:artists,id',
             'file' => 'required|file|mimetypes:audio/mpeg,audio/mp3,audio/wav,audio/wave,audio/x-wav,audio/ogg,audio/x-ogg|max:20480',
             'cover' => 'nullable|image|max:2048',
         ]);
 
+        $artist = \App\Models\Artist::findOrFail($request->artist_id);
+        $artistName = $artist->name;
+
         // Generate Custom Filename: Artist - Title.mp3
         $originalExt = $request->file('file')->getClientOriginalExtension();
-        $filename = $request->artist . ' - ' . $request->title . '.' . $originalExt;
+        $filename = $artistName . ' - ' . $request->title . '.' . $originalExt;
         
         // Sanitize filename (remove special chars except space, dot, dash)
         $filename = preg_replace('/[^A-Za-z0-9\-\.\ ]/', '', $filename);
-        
-        // Ensure unique filename if exists
-        // (Optional: Laravel storeAs handles overwrite? No, it overwrites. We might want to append time or uniqueid if needed, but User asked for Artist - Title)
-        // Let's append timestamp to be safe and unique but keep artist-title visible
-        // Actually, user wants "Artist - SongName". Let's stick to that.
-        // If file exists, it will be overwritten which might be desired for updates, or bad.
-        // Let's add a unique ID to avoid overwriting different versions?
-        // User asked "Artist_name-song_name". Let's do exactly that.
         
         $filePath = $request->file('file')->storeAs('songs', $filename, 'public');
         $absoluteFilePath = storage_path('app/public/' . $filePath);
@@ -92,16 +96,17 @@ class SongController extends Controller
         }
 
         // Save to Database
-        \App\Models\Song::create([
-            'user_id' => Auth::id(),
+        $song = \App\Models\Song::create([
+            // 'user_id' => Auth::id(), // Removed
             'title' => $request->title,
-            'artist' => $request->artist,
+            // 'artist' => $artistName, // Removed
+            'artist_id' => $artist->id, 
             'description' => $request->description,
-            'country_id' => $request->country_id,
+            // 'country_id' => $artist->country_id, // Removed
             'file_path' => $filePath,
             'cover_path' => $coverPath,
             // New Metadata Fields
-            'album' => $fileMetadata['album'] ?? null,
+            // 'album' => $fileMetadata['album'] ?? null, // Removed
             'year' => $fileMetadata['year'] ?? date('Y'),
             'duration' => $fileMetadata['duration'] ?? null,
             'duration_seconds' => $fileMetadata['duration_seconds'] ?? 0,
@@ -113,7 +118,7 @@ class SongController extends Controller
         try {
             $metaService->updateMetadata($absoluteFilePath, [
                 'title' => $request->title,
-                'artist' => $request->artist,
+                'artist' => $artistName,
                 'album' => $fileMetadata['album'] ?? 'TestMusic App Uploads',
                 'comment' => $request->description,
                 'year' => date('Y'),
@@ -126,11 +131,20 @@ class SongController extends Controller
         return redirect()->route('songs.index')->with('success', 'Song uploaded successfully!');
     }
 
-    public function show(\App\Models\Song $song)
+    public function show(\App\Models\Country $country, \App\Models\Artist $artist, \App\Models\Song $song)
     {
+        // Validate relationships
+        if ($song->artist_id !== $artist->id) {
+            abort(404, 'Song does not belong to this artist');
+        }
+        if ($artist->country_id && $artist->country_id !== $country->id) {
+             abort(404, 'Artist does not belong to this country');
+        }
+
         // Get related songs (same artist or recent uploads)
-        $relatedSongs = \App\Models\Song::where('artist', $song->artist)
+        $relatedSongs = \App\Models\Song::where('artist_id', $artist->id)
             ->where('id', '!=', $song->id)
+            ->with(['artistProfile.country', 'albumRelation'])
             ->latest()
             ->take(6)
             ->get();
@@ -139,6 +153,7 @@ class SongController extends Controller
         if ($relatedSongs->count() < 6) {
             $additionalSongs = \App\Models\Song::where('id', '!=', $song->id)
                 ->whereNotIn('id', $relatedSongs->pluck('id'))
+                ->with(['artistProfile.country', 'albumRelation'])
                 ->latest()
                 ->take(6 - $relatedSongs->count())
                 ->get();
@@ -146,7 +161,7 @@ class SongController extends Controller
             $relatedSongs = $relatedSongs->merge($additionalSongs);
         }
 
-        return view('songs.show', compact('song', 'relatedSongs'));
+        return view('songs.show', compact('song', 'relatedSongs', 'artist', 'country'));
     }
 
     public function destroy(\App\Models\Song $song)
@@ -172,7 +187,9 @@ class SongController extends Controller
             // Show user's liked songs
             $likes = \App\Models\Like::where('user_id', Auth::id())
                               ->where('likeable_type', \App\Models\Song::class)
-                              ->with('likeable')
+                              ->with(['likeable' => function($query) {
+                                  $query->with('artistProfile.country');
+                              }])
                               ->latest()
                               ->get();
 
