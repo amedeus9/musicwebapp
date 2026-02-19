@@ -71,6 +71,15 @@
                             <span class="pt-px hidden md:inline">DELETE</span>
                         </button>
                     </form>
+                @else
+                    <button 
+                        id="follow-playlist-btn"
+                        data-playlist-slug="{{ $playlist->slug }}"
+                        data-is-following="{{ auth()->user()->isFollowing($playlist) ? 'true' : 'false' }}"
+                        class="px-4 py-2 border border-[#53a1b3]/30 text-[#53a1b3] rounded-[3px] text-xs uppercase tracking-widest transition flex items-center gap-2 hover:border-white hover:text-white group-follow">
+                        <ion-icon name="{{ auth()->user()->isFollowing($playlist) ? 'heart' : 'heart-outline' }}" class="w-4 h-4"></ion-icon>
+                        <span>{{ auth()->user()->isFollowing($playlist) ? 'Following' : 'Follow' }}</span>
+                    </button>
                 @endif
                 @endauth
 
@@ -364,5 +373,60 @@
             firstPlayBtn.click();
         }
     }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const followPlaylistBtn = document.getElementById('follow-playlist-btn');
+        if (followPlaylistBtn) {
+            followPlaylistBtn.addEventListener('click', async () => {
+                if (followPlaylistBtn.disabled) return;
+                
+                const slug = followPlaylistBtn.dataset.playlistSlug;
+                const isFollowing = followPlaylistBtn.dataset.isFollowing === 'true';
+                const url = isFollowing ? `/playlists/${slug}/unfollow` : `/playlists/${slug}/follow`;
+
+                followPlaylistBtn.disabled = true;
+                followPlaylistBtn.style.opacity = '0.7';
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                         const data = await response.json();
+                         if (data.success) {
+                             const newState = !isFollowing;
+                             followPlaylistBtn.dataset.isFollowing = newState;
+                             
+                             const icon = followPlaylistBtn.querySelector('ion-icon');
+                             const text = followPlaylistBtn.querySelector('span');
+
+                             if (newState) {
+                                 icon.setAttribute('name', 'heart');
+                                 text.textContent = 'Following';
+                             } else {
+                                 icon.setAttribute('name', 'heart-outline');
+                                 text.textContent = 'Follow';
+                             }
+                         }
+                    } else {
+                        console.error('Request failed');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                } finally {
+                    followPlaylistBtn.disabled = false;
+                    followPlaylistBtn.style.opacity = '1';
+                }
+            });
+        }
+    });
 </script>
 @endsection

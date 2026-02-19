@@ -58,4 +58,9 @@ class Playlist extends Model
     {
         return $this->belongsToMany(User::class, 'playlist_user');
     }
+
+    public function followers()
+    {
+        return $this->morphToMany(User::class, 'followable', 'follows', 'followable_id', 'user_id');
+    }
 }

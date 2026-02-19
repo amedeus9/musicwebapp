@@ -39,6 +39,14 @@ Route::delete('/interactions/comment/{comment}', [InteractionController::class, 
 
 // Playlist Routes
 use App\Http\Controllers\PlaylistController;
+use App\Http\Controllers\FollowController;
+
+// Follow Routes
+Route::post('/artists/{artist}/follow', [FollowController::class, 'followArtist'])->name('follow.artist')->middleware('auth');
+Route::post('/artists/{artist}/unfollow', [FollowController::class, 'unfollowArtist'])->name('unfollow.artist')->middleware('auth');
+
+Route::post('/playlists/{playlist:slug}/follow', [FollowController::class, 'followPlaylist'])->name('follow.playlist')->middleware('auth');
+Route::post('/playlists/{playlist:slug}/unfollow', [FollowController::class, 'unfollowPlaylist'])->name('unfollow.playlist')->middleware('auth');
 Route::get('/playlists', [PlaylistController::class, 'index'])->name('playlists.index');
 Route::get('/playlists/create', [PlaylistController::class, 'create'])->name('playlists.create')->middleware('auth');
 Route::post('/playlists', [PlaylistController::class, 'store'])->name('playlists.store')->middleware('auth');

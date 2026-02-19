@@ -29,6 +29,11 @@ class Artist extends Model
         return $this->belongsTo(Country::class);
     }
 
+    public function followers()
+    {
+        return $this->morphToMany(User::class, 'followable', 'follows', 'followable_id', 'user_id');
+    }
+
     public function getRouteKeyName(): string
     {
         return 'slug';

@@ -83,4 +83,38 @@ class User extends Authenticatable
             'is_admin' => 'boolean',
         ];
     }
+    /**
+     * Follow system methods
+     */
+    public function follow($entity)
+    {
+        return \App\Models\Follow::firstOrCreate([
+            'user_id' => $this->id,
+            'followable_id' => $entity->id,
+            'followable_type' => get_class($entity)
+        ]);
+    }
+
+    public function unfollow($entity)
+    {
+        return \App\Models\Follow::where([
+            'user_id' => $this->id,
+            'followable_id' => $entity->id,
+            'followable_type' => get_class($entity)
+        ])->delete();
+    }
+
+    public function isFollowing($entity): bool
+    {
+        return \App\Models\Follow::where([
+            'user_id' => $this->id,
+            'followable_id' => $entity->id,
+            'followable_type' => get_class($entity)
+        ])->exists();
+    }
+
+    public function followedArtists()
+    {
+        return $this->morphedByMany(Artist::class, 'followable', 'follows', 'user_id', 'followable_id');
+    }
 }
