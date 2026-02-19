@@ -42,7 +42,7 @@
             @if($song->album)
             <div class="flex items-center gap-2">
                 <span class="text-[10px] text-[#53a1b3]/30 uppercase">From the album:</span>
-                <a href="{{ route('albums.show', $song->album) }}" class="text-[10px] text-[#e96c4c] uppercase hover:underline hover:text-[#e96c4c]/80 transition">{{ $song->album->title }}</a>
+                <span class="text-[10px] text-[#e96c4c] uppercase">{{ is_string($song->album) ? $song->album : $song->album->title }}</span>
             </div>
             @endif
 

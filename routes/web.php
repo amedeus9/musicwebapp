@@ -86,5 +86,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/artists', function () { return redirect()->route('admin.dashboard'); })->name('artists.index');
     Route::get('/playlists', function () { return redirect()->route('admin.dashboard'); })->name('playlists.index');
     Route::get('/comments', function () { return redirect()->route('admin.dashboard'); })->name('comments.index');
-    Route::get('/settings', function () { return redirect()->route('admin.dashboard'); })->name('settings');
+    // Settings Management
+    Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings');
+    Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 });

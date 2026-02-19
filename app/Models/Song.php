@@ -16,8 +16,16 @@ class Song extends Model
         'cover_path',
         'downloads',
         'country_id',
+        'album',
         'artist_id',
         'album_id',
+        'genre',
+        'year',
+        'duration',
+        'duration_seconds',
+        'bitrate',
+        'file_size',
+        'lyrics',
     ];
 
     public function user()

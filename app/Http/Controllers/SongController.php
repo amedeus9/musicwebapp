@@ -47,7 +47,7 @@ class SongController extends Controller
         return view('songs.create', compact('countries'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, \App\Services\AudioMetadataService $metaService)
     {
         $request->validate([
             'title' => 'required',
@@ -57,13 +57,41 @@ class SongController extends Controller
             'cover' => 'nullable|image|max:2048',
         ]);
 
-        $filePath = $request->file('file')->store('songs', 'public');
+        // Generate Custom Filename: Artist - Title.mp3
+        $originalExt = $request->file('file')->getClientOriginalExtension();
+        $filename = $request->artist . ' - ' . $request->title . '.' . $originalExt;
+        
+        // Sanitize filename (remove special chars except space, dot, dash)
+        $filename = preg_replace('/[^A-Za-z0-9\-\.\ ]/', '', $filename);
+        
+        // Ensure unique filename if exists
+        // (Optional: Laravel storeAs handles overwrite? No, it overwrites. We might want to append time or uniqueid if needed, but User asked for Artist - Title)
+        // Let's append timestamp to be safe and unique but keep artist-title visible
+        // Actually, user wants "Artist - SongName". Let's stick to that.
+        // If file exists, it will be overwritten which might be desired for updates, or bad.
+        // Let's add a unique ID to avoid overwriting different versions?
+        // User asked "Artist_name-song_name". Let's do exactly that.
+        
+        $filePath = $request->file('file')->storeAs('songs', $filename, 'public');
+        $absoluteFilePath = storage_path('app/public/' . $filePath);
+        
         $coverPath = null;
+        $absoluteCoverPath = null;
 
         if ($request->hasFile('cover')) {
             $coverPath = $request->file('cover')->store('covers', 'public');
+            $absoluteCoverPath = storage_path('app/public/' . $coverPath);
         }
 
+        // Read Metadata for Database
+        $fileMetadata = [];
+        try {
+            $fileMetadata = $metaService->getMetadata($absoluteFilePath);
+        } catch (\Exception $e) {
+            \Log::warning('Failed to read MP3 metadata: ' . $e->getMessage());
+        }
+
+        // Save to Database
         \App\Models\Song::create([
             'user_id' => Auth::id(),
             'title' => $request->title,
@@ -72,7 +100,28 @@ class SongController extends Controller
             'country_id' => $request->country_id,
             'file_path' => $filePath,
             'cover_path' => $coverPath,
+            // New Metadata Fields
+            'album' => $fileMetadata['album'] ?? null,
+            'year' => $fileMetadata['year'] ?? date('Y'),
+            'duration' => $fileMetadata['duration'] ?? null,
+            'duration_seconds' => $fileMetadata['duration_seconds'] ?? 0,
+            'bitrate' => $fileMetadata['bitrate'] ?? null,
+            'file_size' => $request->file('file')->getSize(),
         ]);
+
+        // Update MP3 Metadata (ID3 Tags) with form data (overwriting file tags if needed)
+        try {
+            $metaService->updateMetadata($absoluteFilePath, [
+                'title' => $request->title,
+                'artist' => $request->artist,
+                'album' => $fileMetadata['album'] ?? 'TestMusic App Uploads',
+                'comment' => $request->description,
+                'year' => date('Y'),
+            ], $absoluteCoverPath);
+        } catch (\Exception $e) {
+            // Log error but continue (don't fail the upload just because tags failed)
+            \Illuminate\Support\Facades\Log::warning('Failed to update ID3 tags: ' . $e->getMessage());
+        }
 
         return redirect()->route('songs.index')->with('success', 'Song uploaded successfully!');
     }
