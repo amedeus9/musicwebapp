@@ -28,6 +28,48 @@
         </div>
     </div>
 
+    {{-- Trending By Location Sections --}}
+    @foreach ($trendingSections as $section)
+    <div class="mt-2">
+        <x-section-header :title="$section['title']" :scroll-id="$section['scroll_id']" />
+        <div id="{{ $section['scroll_id'] }}" class="flex overflow-x-auto gap-2 pb-2 scrollbar-hide scroll-smooth px-1">
+            @foreach($section['songs'] as $song)
+            <div class="flex-shrink-0 w-[150px] group relative">
+                @php
+                    $artistProfile = $song->artistProfile;
+                    $countrySlug = $artistProfile?->country->slug ?? 'global';
+                    $artistSlug = $artistProfile?->slug ?? \Illuminate\Support\Str::slug($song->artist);
+                    $songUrl = route('songs.show', ['country' => $countrySlug, 'artist' => $artistSlug, 'song' => $song->slug]);
+                @endphp
+                <a href="{{ $songUrl }}" class="block relative mb-2">
+                    <div class="w-[150px] h-[150px] border border-[#53a1b3]/20 group-hover:border-[#e96c4c]/50 transition overflow-hidden bg-[#0f1319]">
+                        <x-cover-art :path="$song->cover_path" :alt="$song->title" :hover="true" fallback-icon="flame" />
+                    </div>
+                    <!-- Rank Badge -->
+                    <div class="absolute top-0 left-0 bg-[#e96c4c] px-2 py-0.5 text-[10px] font-bold text-white z-10 rounded-br-[3px] shadow-sm">
+                        #{{ $loop->iteration }}
+                    </div>
+                </a>
+                <h3 class="font-normal text-white text-sm leading-tight truncate px-0.5">{{ $song->title }}</h3>
+                <p class="text-[10px] text-[#53a1b3] truncate px-0.5">{{ $song->artist }}</p>
+                
+                <!-- Stats Row -->
+                <div class="flex items-center gap-3 px-0.5 mt-1 text-[10px] text-[#53a1b3]/60">
+                    <div class="flex items-center gap-1">
+                        <ion-icon name="play" class="w-3 h-3"></ion-icon>
+                        <span>{{ $song->recent_plays_count ?? 0 }}</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <ion-icon name="download" class="w-3 h-3"></ion-icon>
+                        <span>{{ $song->recent_downloads_count ?? 0 }}</span>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endforeach
+
     {{-- Featured Albums --}}
     <div class="mt-2">
         <x-section-header title="Featured Albums" scroll-id="featured-albums-scroll" />
@@ -112,29 +154,7 @@
         </div>
 
         {{-- Trending Songs --}}
-        <div class="mt-2">
-            <x-section-header title="Trending Songs" scroll-id="trending-songs-scroll" />
-            <div id="trending-songs-scroll" class="flex overflow-x-auto gap-2 pb-2 scrollbar-hide scroll-smooth">
-                @foreach($songs->sortByDesc('downloads')->take(5) as $song)
-                <div class="flex-shrink-0 w-[120px] group">
-                    @php
-                        $artistProfile = $song->artistProfile;
-                        $countrySlug = $artistProfile?->country->slug ?? 'global';
-                        $artistSlug = $artistProfile?->slug ?? \Illuminate\Support\Str::slug($song->artist);
-                        $songUrl = route('songs.show', ['country' => $countrySlug, 'artist' => $artistSlug, 'song' => $song->slug]);
-                    @endphp
-                    <a href="{{ $songUrl }}" class="block relative mb-2">
-                        <div class="w-[120px] h-[120px] border border-[#53a1b3]/20 group-hover:border-[#e96c4c]/50 transition overflow-hidden">
-                            <x-cover-art :path="$song->cover_path" :alt="$song->title" fallback-icon="cloud-upload-outline" icon-color="text-orange-500" />
-                        </div>
-                        <div class="absolute top-1 left-1 bg-[#e96c4c] px-1.5 text-[8px] font-normal text-white">#{{ $loop->iteration }}</div>
-                    </a>
-                    <h3 class="font-normal text-white text-xs leading-tight truncate px-0.5">{{ $song->title }}</h3>
-                    <p class="text-[9px] text-[#53a1b3] truncate px-0.5">{{ $song->artist }}</p>
-                </div>
-                @endforeach
-            </div>
-        </div>
+
 
         {{-- Top Downloads --}}
         <div class="mt-2">

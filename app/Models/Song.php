@@ -78,6 +78,42 @@ class Song extends Model
                     ->withTimestamps();
     }
 
+    public function interactions()
+    {
+        return $this->hasMany(SongInteraction::class);
+    }
+
+    public function scopeTrending($query, $artistCountryId = null, $interactionCountryCode = null)
+    {
+        $cutoff = now()->subHours(24);
+
+        $query->withCount([
+            'interactions as recent_plays_count' => function ($q) use ($cutoff, $interactionCountryCode) {
+                $q->where('type', 'play')->where('created_at', '>=', $cutoff);
+                if ($interactionCountryCode) {
+                    $q->where('country_code', $interactionCountryCode);
+                }
+            },
+            'interactions as recent_downloads_count' => function ($q) use ($cutoff, $interactionCountryCode) {
+                $q->where('type', 'download')->where('created_at', '>=', $cutoff);
+                if ($interactionCountryCode) {
+                    $q->where('country_code', $interactionCountryCode);
+                }
+            },
+            'likes as recent_likes_count' => function ($q) use ($cutoff) {
+                $q->where('created_at', '>=', $cutoff);
+            }
+        ]);
+
+        if ($artistCountryId) {
+             $query->whereHas('artistProfile', function ($q) use ($artistCountryId) {
+                 $q->where('country_id', $artistCountryId);
+             });
+        }
+
+        return $query->orderByRaw('(recent_plays_count + recent_downloads_count + recent_likes_count) DESC')->latest();
+    }
+
     public function getRouteKeyName(): string
     {
         return 'slug';

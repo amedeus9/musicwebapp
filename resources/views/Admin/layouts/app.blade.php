@@ -97,6 +97,11 @@
                 </a>
 
                 <p class="text-[10px] font-normal text-[#53a1b3]/50 uppercase tracking-widest px-2 mb-1 mt-4">Settings</p>
+                
+                <a href="{{ route('admin.countries.index') }}" class="flex items-center gap-3 px-3 py-2.5 group transition {{ request()->routeIs('admin.countries.*') ? 'bg-[#e96c4c] text-white shadow-lg shadow-[#e96c4c]/20' : 'text-[#53a1b3] hover:bg-[#53a1b3]/10 hover:text-white' }}">
+                    <ion-icon name="earth-outline" class="w-5 h-5"></ion-icon>
+                    <span class="text-xs font-normal uppercase tracking-wider">Countries</span>
+                </a>
 
                 <a href="{{ route('admin.settings') }}" class="flex items-center gap-3 px-3 py-2.5 group transition {{ request()->routeIs('admin.settings') ? 'bg-[#e96c4c] text-white shadow-lg shadow-[#e96c4c]/20' : 'text-[#53a1b3] hover:bg-[#53a1b3]/10 hover:text-white' }}">
                     <ion-icon name="settings-outline" class="w-5 h-5"></ion-icon>

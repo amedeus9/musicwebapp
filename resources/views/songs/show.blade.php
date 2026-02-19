@@ -302,6 +302,15 @@
                             const button = document.getElementById('play-btn-header') || document.getElementById('play-btn-header-mobile');
                             window.globalPlayer.show(audio, songData, button);
                         }
+
+                        // Register Play for Trending
+                        fetch("{{ route('songs.play', $song) }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            }
+                        }).catch(err => console.error('Failed to register play', err));
                     }).catch(error => {
                         // Auto-play was prevented
                     });

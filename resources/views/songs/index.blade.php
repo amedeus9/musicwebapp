@@ -83,6 +83,17 @@
                     if (window.globalPlayer) {
                         window.globalPlayer.show(audio, { title, artist, cover }, button);
                     }
+                    
+                    // Register Play for Trending
+                    const songIdNumeric = audioId.replace('audio-', '');
+                    fetch(`/songs/${songIdNumeric}/play`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    }).catch(err => console.error('Failed to register play', err));
+
                 }).catch(() => {
                     // Autoplay may be blocked
                 });

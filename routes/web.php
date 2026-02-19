@@ -23,6 +23,7 @@ Route::post('/songs', [SongController::class, 'store'])->name('songs.store')->mi
 // Route::get('/songs/{song:slug}', [SongController::class, 'show'])->name('songs.show'); // Moved to dynamic route
 Route::delete('/songs/{song:slug}', [SongController::class, 'destroy'])->name('songs.destroy')->middleware('auth');
 Route::get('/songs/{song:slug}/download', [SongController::class, 'download'])->name('songs.download');
+Route::post('/songs/{song}/play', [SongController::class, 'registerPlay'])->name('songs.play');
 
 // New Routes
 Route::get('/favorites', [SongController::class, 'favorites'])->name('favorites');
@@ -85,6 +86,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
     // Artist Management
     Route::resource('artists', \App\Http\Controllers\Admin\ArtistController::class);
+    
+    // Country Management
+    Route::get('/countries', [\App\Http\Controllers\Admin\CountryController::class, 'index'])->name('countries.index');
+    Route::post('/countries/{country}/trending', [\App\Http\Controllers\Admin\CountryController::class, 'updateTrending'])->name('countries.trending');
 
     // Placeholder routes - to be implemented
     Route::get('/albums', function () { return redirect()->route('admin.dashboard'); })->name('albums.index');

@@ -34,7 +34,14 @@ class SongController extends Controller
             });
         }
 
-        $songs = $query->with(['artistProfile.country', 'albumRelation'])->latest()->paginate(20);
+        // Trending Sort
+        if ($request->has('sort') && $request->sort == 'trending') {
+            $query->trending($request->country_id);
+        } else {
+            $query->latest();
+        }
+
+        $songs = $query->with(['artistProfile.country', 'albumRelation'])->paginate(20);
 
         if ($request->ajax()) {
             return view('songs.partials.list', compact('songs'));
@@ -175,10 +182,31 @@ class SongController extends Controller
         return redirect()->route('songs.index')->with('success', 'Song deleted successfully!');
     }
 
-    public function download(\App\Models\Song $song)
+    public function download(\App\Models\Song $song, \App\Services\UserLocationService $locationService)
     {
         $song->increment('downloads');
+        
+        // Log interaction for trending
+        \App\Models\SongInteraction::create([
+            'song_id' => $song->id,
+            'type' => 'download',
+            'user_id' => \Illuminate\Support\Facades\Auth::id(),
+            'country_code' => $locationService->getCountryCode(),
+        ]);
+
         return response()->download(storage_path('app/public/' . $song->file_path));
+    }
+
+    public function registerPlay(\App\Models\Song $song, \App\Services\UserLocationService $locationService)
+    {
+        \App\Models\SongInteraction::create([
+            'song_id' => $song->id,
+            'type' => 'play',
+            'user_id' => \Illuminate\Support\Facades\Auth::id(),
+            'country_code' => $locationService->getCountryCode(),
+        ]);
+
+        return response()->json(['success' => true]);
     }
 
     public function favorites()
