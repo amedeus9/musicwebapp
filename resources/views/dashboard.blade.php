@@ -31,7 +31,7 @@
     {{-- Trending By Location Sections --}}
     @foreach ($trendingSections as $section)
     <div class="mt-2">
-        <x-section-header :title="$section['title']" :scroll-id="$section['scroll_id']" />
+        <x-section-header :title="$section['title']" :scroll-id="$section['scroll_id']" :view-all="$section['view_all_url']" />
         <div id="{{ $section['scroll_id'] }}" class="flex overflow-x-auto gap-2 pb-2 scrollbar-hide scroll-smooth px-1">
             @foreach($section['songs'] as $song)
             <div class="flex-shrink-0 w-[150px] group relative">

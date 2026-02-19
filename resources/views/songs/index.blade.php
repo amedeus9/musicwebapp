@@ -1,7 +1,24 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="flex flex-col gap-0">
+    <!-- Header Section -->
+    <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2">
+            <div class="w-12 h-12 flex items-center justify-center bg-[#53a1b3]/10 rounded-[3px] border border-[#53a1b3]/20 shrink-0 text-[#53a1b3]">
+                <ion-icon name="musical-notes" class="w-6 h-6"></ion-icon>
+            </div>
+            <div>
+                <h1 class="text-lg font-normal text-white uppercase tracking-wider">{{ $title ?? 'Browse Songs' }}</h1>
+                <p class="text-[10px] text-[#53a1b3]/50 uppercase tracking-widest mt-0.5">
+                    @if(isset($country))
+                        Music from {{ $country->name }}
+                    @else
+                        Discover the latest tracks
+                    @endif
+                </p>
+            </div>
+        </div>
+    </div>
 
     <!-- Song List (Grid) -->
     <div id="songs-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-2 min-h-[50vh]">
@@ -23,8 +40,6 @@
 
     <!-- Sentinel for Infinite Scroll -->
     <div id="sentinel" class="h-4"></div>
-
-</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

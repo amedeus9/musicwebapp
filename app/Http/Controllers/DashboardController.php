@@ -37,6 +37,7 @@ class DashboardController extends Controller
                 
                 $title = "Global Trending";
                 $scrollId = "trending-global";
+                $viewAllUrl = route('country.trending', ['country' => 'global']);
             } else {
                 // Fetch songs trending in this location
                 $songs = \App\Models\Song::with(['artistProfile.country', 'albumRelation'])
@@ -44,24 +45,29 @@ class DashboardController extends Controller
                     ->limit($limit)
                     ->get();
 
-                // Get Country Name
+                // Get Country Name and Slug
                 $title = "Trending " . $code;
                 $scrollId = "trending-" . strtolower($code);
-                
+                $slug = $code; // Default fallback
+
                 $countryModel = \App\Models\Country::where('iso_code', $code)->first();
                 if ($countryModel) {
                     $title = "Trending " . $countryModel->name;
+                    $slug = $countryModel->slug;
                 } elseif (class_exists('\Symfony\Component\Intl\Countries')) {
                      $name = \Symfony\Component\Intl\Countries::getName($code) ?? $code;
                      $title = "Trending " . $name;
                 }
+                
+                $viewAllUrl = route('country.trending', ['country' => $slug]);
             }
 
             if ($songs->isNotEmpty()) {
                 $trendingSections[] = [
                     'title' => $title,
                     'songs' => $songs,
-                    'scroll_id' => $scrollId
+                    'scroll_id' => $scrollId,
+                    'view_all_url' => $viewAllUrl
                 ];
             }
         }

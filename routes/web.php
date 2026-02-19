@@ -100,6 +100,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 });
 
+// Country Routes
+Route::get('/countries', [\App\Http\Controllers\CountrySongController::class, 'list'])->name('countries.list');
+Route::get('/{country}/songs', [\App\Http\Controllers\CountrySongController::class, 'index'])->name('country.songs');
+Route::get('/{country}/trending-songs', [\App\Http\Controllers\CountrySongController::class, 'trending'])->name('country.trending');
+
 // Dynamic Artist Route (Must be last - 2 params)
 Route::get('/{country:slug}/{artist:slug}', [ArtistController::class, 'show'])->name('artists.show');
 
