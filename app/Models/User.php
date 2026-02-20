@@ -117,4 +117,9 @@ class User extends Authenticatable
     {
         return $this->morphedByMany(Artist::class, 'followable', 'follows', 'user_id', 'followable_id');
     }
+
+    public function followedPlaylists()
+    {
+        return $this->morphedByMany(Playlist::class, 'followable', 'follows', 'user_id', 'followable_id');
+    }
 }

@@ -235,44 +235,5 @@ class SongController extends Controller
         return view('pages.favorites', compact('songs', 'hasFavorites'));
     }
 
-    public function profile()
-    {
-        return view('pages.profile');
-    }
 
-    public function editProfile()
-    {
-        return view('pages.profile-edit');
-    }
-
-    public function updateProfile(Request $request)
-    {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'current_password' => 'required',
-            'password' => 'nullable|min:8|confirmed',
-        ]);
-
-        // Verify current password
-        if (!Hash::check($request->current_password, $user->password)) {
-            return back()->withErrors(['current_password' => 'Current password is incorrect']);
-        }
-
-        // Update name and email
-        $user->name = $request->name;
-        $user->email = $request->email;
-
-        // Update password if provided
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
-        }
-
-        $user->save();
-
-        return redirect()->route('profile')->with('success', 'Profile updated successfully!');
-    }
 }

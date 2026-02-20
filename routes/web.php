@@ -25,11 +25,13 @@ Route::delete('/songs/{song:slug}', [SongController::class, 'destroy'])->name('s
 Route::get('/songs/{song:slug}/download', [SongController::class, 'download'])->name('songs.download');
 Route::post('/songs/{song}/play', [SongController::class, 'registerPlay'])->name('songs.play');
 
+use App\Http\Controllers\ProfileController;
+
 // New Routes
 Route::get('/favorites', [SongController::class, 'favorites'])->name('favorites');
-Route::get('/profile', [SongController::class, 'profile'])->name('profile')->middleware('auth');
-Route::get('/profile/edit', [SongController::class, 'editProfile'])->name('profile.edit')->middleware('auth');
-Route::put('/profile', [SongController::class, 'updateProfile'])->name('profile.update')->middleware('auth');
+Route::get('/profile', [ProfileController::class, 'show'])->name('profile')->middleware('auth');
+Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit')->middleware('auth');
+Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update')->middleware('auth');
 
 // Interaction Routes
 use App\Http\Controllers\InteractionController;
@@ -97,6 +99,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     
     // Country Management
     Route::get('/countries', [\App\Http\Controllers\Admin\CountryController::class, 'index'])->name('countries.index');
+    Route::get('/countries/create', [\App\Http\Controllers\Admin\CountryController::class, 'create'])->name('countries.create');
+    Route::post('/countries', [\App\Http\Controllers\Admin\CountryController::class, 'store'])->name('countries.store');
+    Route::get('/countries/{country}/edit', [\App\Http\Controllers\Admin\CountryController::class, 'edit'])->name('countries.edit');
+    Route::put('/countries/{country}', [\App\Http\Controllers\Admin\CountryController::class, 'update'])->name('countries.update');
+    Route::delete('/countries/{country}', [\App\Http\Controllers\Admin\CountryController::class, 'destroy'])->name('countries.destroy');
     Route::post('/countries/{country}/trending', [\App\Http\Controllers\Admin\CountryController::class, 'updateTrending'])->name('countries.trending');
 
     // Placeholder routes - to be implemented

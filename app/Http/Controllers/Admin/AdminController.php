@@ -33,7 +33,7 @@ class AdminController extends Controller
         ];
 
         // Recent activity
-        $recentSongs = Song::with('user')->withCount(['likes', 'comments'])->latest()->take(5)->get();
+        $recentSongs = Song::with('artistProfile')->withCount(['likes', 'comments'])->latest()->take(5)->get();
         $recentUsers = User::latest()->take(5)->get();
 
         // System stats

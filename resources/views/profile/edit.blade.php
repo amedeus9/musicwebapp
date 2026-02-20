@@ -4,7 +4,7 @@
 <div class="flex-1 flex flex-col overflow-y-auto pb-24 gap-1">
     
     <!-- Header -->
-    <div class="flex items-center gap-2 mb-6">
+    <div class="flex items-center gap-2 mb-6 px-8 pt-8">
         <div class="w-12 h-12 flex items-center justify-center bg-[#e96c4c]/10 rounded-[3px] border border-[#e96c4c]/20 shrink-0">
             <ion-icon name="person" class="w-6 h-6 text-[#e96c4c]"></ion-icon>
         </div>
@@ -15,7 +15,7 @@
     </div>
 
     <!-- Edit Form -->
-    <div class="max-w-2xl">
+    <div class="max-w-2xl px-8">
         <form action="{{ route('profile.update') }}" method="POST" class="space-y-8">
             @csrf
             @method('PUT')
@@ -129,11 +129,10 @@
                     href="{{ route('profile') }}" 
                     class="px-6 py-2 bg-transparent border border-[#53a1b3]/20 text-[#53a1b3] hover:text-white hover:border-[#53a1b3]/50 text-xs font-normal uppercase tracking-widest rounded-[3px] transition"
                 >
-                    Cancel
+                     Cancel
                 </a>
             </div>
         </form>
     </div>
-
 </div>
 @endsection
